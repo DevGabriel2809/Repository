@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gabriel Andrade · Dev</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">&lt;DevGabriel /&gt;</div>
+  <ul class="nav-links">
+    <li><a href="#about">Sobre</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projetos</a></li>
+    <li><a href="#certs">Cursos</a></li>
+    <li><a href="#contact">Contato</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-tag">Disponível para oportunidades</div>
+    <h1 class="hero-name">
+      Gabriel<br><span class="accent">Andrade</span>
+    </h1>
+    <p class="hero-subtitle">
+      <span id="typing-text"></span><span class="typing-cursor"></span>
+    </p>
+    <p class="hero-desc">
+      Estudante de Engenharia de Software, desenvolvedor web apaixonado por construir experiências digitais funcionais e elegantes. Técnico em Redes com background em Python, JavaScript, HTML e CSS.
+    </p>
+    <div class="hero-ctas">
+      <a href="https://github.com/DevGabriel2809" target="_blank" class="btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+        GitHub
+      </a>
+      <a href="#contact" class="btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Contato
+      </a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    scroll para ver mais
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-grid">
+    <div class="about-text reveal">
+      <div class="section-label">01 — Sobre mim</div>
+      <h2 class="section-title">Código que<br>resolve problemas.</h2>
+      <p>Tenho <strong>20 anos</strong>, sou de Recife — PE, e estou cursando <strong>Engenharia de Software</strong> na Universidade Católica de Brasília. Antes disso, me formei técnico em <strong>Redes de Computadores</strong> pela ETE Professor Lucilo Ávila Pessoa.</p>
+      <p>Meu interesse por programação vai além da sala de aula: construo projetos reais, automações úteis e plataformas web com foco em código limpo e experiência do usuário. Tenho inglês fluente certificado (<strong>C1 – EF SET</strong>), o que me permite consumir e contribuir com conteúdo técnico internacional sem barreiras.</p>
+      <div class="about-stats">
+        <div class="stat-box">
+          <div class="stat-num">4+</div>
+          <div class="stat-label">Projetos no GitHub</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">422</div>
+          <div class="stat-label">Commits (Nexy Animes)</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">C1</div>
+          <div class="stat-label">Inglês (EF SET)</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">5+</div>
+          <div class="stat-label">Certificações técnicas</div>
+        </div>
+      </div>
+    </div>
+    <div class="about-photo reveal">
+      <!--
+        INSTRUÇÃO: Substitua o conteúdo abaixo por:
+        <img src="SUA_FOTO.jpg" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">
+      -->
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="rgba(0,229,204,0.3)" stroke-width="1">
+        <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+      </svg>
+      <span>// adicione sua foto aqui</span>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="reveal">
+    <div class="section-label">02 — Habilidades</div>
+    <h2 class="section-title">Stack &<br>Tecnologias.</h2>
+  </div>
+  <div class="skills-grid">
+    <div class="skill-card reveal">
+      <div class="skill-icon">🌐</div>
+      <div class="skill-name">Front-End</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.7;">Construção de interfaces web responsivas, semânticas e acessíveis com foco em performance e UX.</p>
+      <div class="skill-tags">
+        <span class="skill-tag">HTML5</span>
+        <span class="skill-tag">CSS3</span>
+        <span class="skill-tag">JavaScript</span>
+        <span class="skill-tag">Flexbox</span>
+        <span class="skill-tag">Grid</span>
+        <span class="skill-tag">DOM</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">🐍</div>
+      <div class="skill-name">Python</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.7;">Scripts de automação, processamento de dados, web scraping e integração com APIs e planilhas.</p>
+      <div class="skill-tags">
+        <span class="skill-tag">Automação</span>
+        <span class="skill-tag">Pandas</span>
+        <span class="skill-tag">Requests</span>
+        <span class="skill-tag">BeautifulSoup</span>
+        <span class="skill-tag">openpyxl</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">🗄️</div>
+      <div class="skill-name">Banco de Dados</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.7;">Modelagem relacional, consultas SQL, normalização e uso de sistemas gerenciadores de BD.</p>
+      <div class="skill-tags">
+        <span class="skill-tag">SQL</span>
+        <span class="skill-tag">Modelagem ER</span>
+        <span class="skill-tag">JOIN / GROUP BY</span>
+        <span class="skill-tag">Normalização</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">☁️</div>
+      <div class="skill-name">Cloud & Infra</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.7;">Fundamentos de cloud computing, infraestrutura de redes e administração de sistemas Linux.</p>
+      <div class="skill-tags">
+        <span class="skill-tag">Azure</span>
+        <span class="skill-tag">AWS</span>
+        <span class="skill-tag">Linux</span>
+        <span class="skill-tag">TCP/IP</span>
+        <span class="skill-tag">DNS/DHCP</span>
+        <span class="skill-tag">SSH</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">📱</div>
+      <div class="skill-name">Mobile</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.7;">Desenvolvimento de aplicações Android com Android Studio, layouts XML e ciclo de vida de activities.</p>
+      <div class="skill-tags">
+        <span class="skill-tag">Android Studio</span>
+        <span class="skill-tag">Java/Kotlin básico</span>
+        <span class="skill-tag">XML Layout</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">🔧</div>
+      <div class="skill-name">Ferramentas</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.7;">Fluxo de trabalho moderno com versionamento, editor e produtividade técnica.</p>
+      <div class="skill-tags">
+        <span class="skill-tag">Git</span>
+        <span class="skill-tag">GitHub</span>
+        <span class="skill-tag">VS Code</span>
+        <span class="skill-tag">Wireshark</span>
+        <span class="skill-tag">REST APIs</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="reveal">
+    <div class="section-label">03 — Projetos</div>
+    <h2 class="section-title">O que eu<br>construí.</h2>
+  </div>
+  <div class="projects-grid">
+
+    <!-- FEATURED: Nexy Animes -->
+    <div class="project-card featured reveal">
+      <div>
+        <div class="project-header">
+          <span class="project-type">Destaque</span>
+          <div class="project-links">
+            <a href="https://github.com/DevGabriel2809/Animes" target="_blank" class="project-link" title="GitHub">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+          </div>
+        </div>
+        <h3 class="project-name">Nexy Animes</h3>
+        <p class="project-desc">Plataforma de streaming de animes e filmes construída do zero com HTML, CSS e JavaScript. Conta com sistema de login, catálogo completo com dados em JSON, player de episódios, páginas de detalhes e script Python para geração de thumbnails. O projeto mais maduro do portfólio, com <strong style="color:var(--cyan)">422 commits</strong> de desenvolvimento contínuo.</p>
+        <div class="project-stack">
+          <span class="stack-tag">HTML5</span>
+          <span class="stack-tag">CSS3</span>
+          <span class="stack-tag">JavaScript</span>
+          <span class="stack-tag">Python</span>
+          <span class="stack-tag">JSON</span>
+        </div>
+      </div>
+      <div class="project-visual">
+        <div class="project-visual-content">
+          &lt;!-- Nexy Animes --&gt;<br>
+          📺 streaming platform<br>
+          🔐 login system<br>
+          🎬 episode player<br>
+          📦 JSON catalog<br>
+          🐍 python scripts
+        </div>
+        <div class="commits-badge">422 commits</div>
+      </div>
+    </div>
+
+    <!-- BlackSheep -->
+    <div class="project-card reveal">
+      <div class="project-header">
+        <span class="project-type">Automação</span>
+        <div class="project-links">
+          <a href="https://github.com/DevGabriel2809/BlackSheep" target="_blank" class="project-link" title="GitHub">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+          </a>
+        </div>
+      </div>
+      <h3 class="project-name">BlackSheep</h3>
+      <p class="project-desc">Ferramenta de automação Python para processamento e análise de grandes bases de dados em planilhas Excel (.xlsx). Gera relatórios automatizados, filtra registros e exporta resultados consolidados — eliminando trabalho manual repetitivo.</p>
+      <div class="project-stack">
+        <span class="stack-tag">Python</span>
+        <span class="stack-tag">openpyxl / pandas</span>
+        <span class="stack-tag">Automação</span>
+        <span class="stack-tag">Excel</span>
+      </div>
+    </div>
+
+    <!-- UIS-Project -->
+    <div class="project-card reveal">
+      <div class="project-header">
+        <span class="project-type">Web App</span>
+        <div class="project-links">
+          <a href="https://github.com/DevGabriel2809/UIS-Project" target="_blank" class="project-link" title="GitHub">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+          </a>
+        </div>
+      </div>
+      <h3 class="project-name">UIS — Project</h3>
+      <p class="project-desc">Plataforma web institucional desenvolvida como projeto universitário (Uninassau GW). Arquitetura modular com componentes reutilizáveis, seção de membros e navegação dinâmica via JavaScript. Projeto colaborativo com 1 fork.</p>
+      <div class="project-stack">
+        <span class="stack-tag">HTML5</span>
+        <span class="stack-tag">CSS3</span>
+        <span class="stack-tag">JavaScript</span>
+        <span class="stack-tag">Componentes</span>
+      </div>
+    </div>
+
+    <!-- Market -->
+    <div class="project-card reveal">
+      <div class="project-header">
+        <span class="project-type">Front-End</span>
+        <div class="project-links">
+          <a href="https://github.com/DevGabriel2809/Market" target="_blank" class="project-link" title="GitHub">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+          </a>
+        </div>
+      </div>
+      <h3 class="project-name">Market</h3>
+      <p class="project-desc">Aplicação web de marketplace com interface responsiva, construída com JavaScript, CSS e HTML. Layout dinâmico com interações de UI e estilização refinada — desenvolvido com atenção à experiência do usuário.</p>
+      <div class="project-stack">
+        <span class="stack-tag">JavaScript</span>
+        <span class="stack-tag">CSS3</span>
+        <span class="stack-tag">HTML5</span>
+        <span class="stack-tag">Tiled</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CERTIFICATIONS -->
+<section id="certs">
+  <div class="reveal">
+    <div class="section-label">04 — Formação</div>
+    <h2 class="section-title">Cursos &<br>Certificações.</h2>
+  </div>
+  <div class="certs-grid">
+    <div class="cert-card reveal">
+      <div class="cert-icon">🗄️</div>
+      <div>
+        <div class="cert-title">Banco de Dados — Trilha (38h)</div>
+        <div class="cert-meta">Ago 2025 · Concluído</div>
+        <div class="cert-issuer">Fundação Bradesco — Escola Virtual</div>
+      </div>
+    </div>
+    <div class="cert-card reveal">
+      <div class="cert-icon">📐</div>
+      <div>
+        <div class="cert-title">Modelagem de Dados</div>
+        <div class="cert-meta">Ago 2025 · Concluído</div>
+        <div class="cert-issuer">Fundação Bradesco — Escola Virtual</div>
+      </div>
+    </div>
+    <div class="cert-card reveal">
+      <div class="cert-icon">📱</div>
+      <div>
+        <div class="cert-title">Aplicações Mobile com Android Studio</div>
+        <div class="cert-meta">Jul 2025 · Concluído</div>
+        <div class="cert-issuer">Fundação Bradesco — Escola Virtual</div>
+      </div>
+    </div>
+    <div class="cert-card reveal">
+      <div class="cert-icon">📊</div>
+      <div>
+        <div class="cert-title">Microsoft Excel 2016 — Básico</div>
+        <div class="cert-meta">Jul 2025 · Concluído</div>
+        <div class="cert-issuer">Fundação Bradesco — Escola Virtual</div>
+      </div>
+    </div>
+    <div class="cert-card reveal">
+      <div class="cert-icon">💡</div>
+      <div>
+        <div class="cert-title">Estratégia de Negócios</div>
+        <div class="cert-meta">Jul 2025 · Concluído</div>
+        <div class="cert-issuer">Fundação Bradesco — Escola Virtual</div>
+      </div>
+    </div>
+    <div class="cert-card reveal">
+      <div class="cert-icon">🇺🇸</div>
+      <div>
+        <div class="cert-title">Inglês — Nível C1</div>
+        <div class="cert-meta">Certificado · EF SET English Certificate</div>
+        <div class="cert-issuer">EF Standard English Test</div>
+      </div>
+    </div>
+    <div class="cert-card reveal">
+      <div class="cert-icon">🔌</div>
+      <div>
+        <div class="cert-title">Técnico em Redes de Computadores</div>
+        <div class="cert-meta">Diploma Técnico · Concluído</div>
+        <div class="cert-issuer">ETE Prof. Lucilo Ávila Pessoa</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="reveal">
+    <div class="section-label">05 — Contato</div>
+    <h2 class="section-title">Vamos<br>conversar.</h2>
+  </div>
+  <p class="contact-sub reveal">Aberto a estágios, projetos freelance e colaborações. Me manda uma mensagem!</p>
+  <div class="contact-links reveal">
+    <a href="mailto:gabriel@email.com" class="contact-btn primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      gabriel@email.com <!-- Preencha -->
+    </a>
+    <a href="https://github.com/DevGabriel2809" target="_blank" class="contact-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+      GitHub
+    </a>
+    <a href="https://linkedin.com/in/gabrielandrade" target="_blank" class="contact-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+      LinkedIn
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2026 Gabriel Andrade</span>
+  <span>Feito com <span class="heart">♥</span> em HTML · CSS · JS</span>
+</footer>
+
+<script>
+// ── CURSOR ──
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cursor.style.left = mx+'px'; cursor.style.top = my+'px'; });
+function animateRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx+'px';
+  ring.style.top = ry+'px';
+  requestAnimationFrame(animateRing);
+}
+animateRing();
+document.querySelectorAll('a, button').forEach(el => {
+  el.addEventListener('mouseenter', () => { ring.style.transform = 'translate(-50%,-50%) scale(1.6)'; ring.style.borderColor = 'rgba(0,229,204,0.8)'; });
+  el.addEventListener('mouseleave', () => { ring.style.transform = 'translate(-50%,-50%) scale(1)'; ring.style.borderColor = 'rgba(0,229,204,0.5)'; });
+});
+
+// ── TYPING EFFECT ──
+const phrases = [
+  'Software Engineering Student',
+  'Web Developer',
+  'Python Automation',
+  'Redes & Cloud',
+  'Always Learning...'
+];
+let pi = 0, ci = 0, del = false;
+const typingEl = document.getElementById('typing-text');
+function type() {
+  const current = phrases[pi];
+  if (!del) {
+    typingEl.textContent = current.slice(0, ++ci);
+    if (ci === current.length) { del = true; setTimeout(type, 1800); return; }
+  } else {
+    typingEl.textContent = current.slice(0, --ci);
+    if (ci === 0) { del = false; pi = (pi + 1) % phrases.length; }
+  }
+  setTimeout(type, del ? 40 : 80);
+}
+type();
+
+// ── SCROLL REVEAL ──
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ── NAV SCROLL ──
+window.addEventListener('scroll', () => {
+  document.querySelector('nav').style.background = window.scrollY > 60
+    ? 'rgba(8,11,16,0.95)' : 'rgba(8,11,16,0.7)';
+});
+</script>
+
+<script src="js/main.js"></script>
+</body>
+</html>
