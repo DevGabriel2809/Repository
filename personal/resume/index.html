@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gabriel Andrade – Engenharia de Software</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html{
+    background-color: #2c2c2a;
+  }
+  :root {
+    --bg: #2c2c2a;
+    --surface: #ffffff;
+    --accent: #1a56db;
+    --accent-light: #e8f0ff;
+    --dark: #111827;
+    --mid: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --tag-bg: #eef2ff;
+    --tag-text: #3730a3;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--dark);
+    font-size: 13.5px;
+    line-height: 1.6;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .page {
+    max-width: 860px;
+    margin: 32px auto;
+    background: var(--surface);
+    box-shadow: 0 4px 32px rgba(0, 0, 0, 0.787);
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 1100px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    background: var(--dark);
+    color: #e5e7eb;
+    padding: 40px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .photo-wrap {
+    display: flex;
+    justify-content: center;
+  }
+  .photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid var(--accent);
+    object-fit: cover;
+    background: #1f2937;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #6b7280;
+    text-align: center;
+    overflow: hidden;
+    position: relative;
+  }
+  .photo-placeholder {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid var(--accent);
+    background: #1f2937;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    font-size: 10px;
+    text-align: center;
+    gap: 4px;
+  }
+  .photo-placeholder svg {
+    width: 36px;
+    height: 36px;
+    opacity: 0.5;
+  }
+
+  .sidebar-section { display: flex; flex-direction: column; gap: 10px; }
+
+  .sidebar-title {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    font-family: 'DM Mono', monospace;
+    border-bottom: 1px solid #374151;
+    padding-bottom: 6px;
+    margin-bottom: 2px;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12.5px;
+    color: #d1d5db;
+    line-height: 1.4;
+    text-decoration: none;
+  }
+  .contact-item svg { flex-shrink: 0; margin-top: 1px; }
+  a.contact-item { color: #d1d5db; text-decoration: none; }
+  a.contact-item:hover { color: #93c5fd; }
+
+  .skill-bar-wrap { display: flex; flex-direction: column; gap: 8px; }
+  .skill-row { display: flex; flex-direction: column; gap: 3px; }
+  .skill-name { font-size: 12px; color: #d1d5db; display: flex; justify-content: space-between; }
+  .skill-name span { color: #6b7280; font-size: 11px; font-family: 'DM Mono', monospace; }
+  .skill-track {
+    height: 4px;
+    background: #374151;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .skill-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+
+  .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag-dark {
+    background: #1f2937;
+    color: #93c5fd;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-family: 'DM Mono', monospace;
+    border: 1px solid #374151;
+  }
+
+  .lang-item { display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; }
+  .lang-level { color: var(--accent); font-size: 11px; font-family: 'DM Mono', monospace; }
+
+  /* ── MAIN ── */
+  .main {
+    padding: 40px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  
+  .name {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--dark);
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+  .title-line {
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-top: 4px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.04em;
+  }
+  .summary {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--mid);
+    line-height: 1.7;
+    border-left: 3px solid var(--accent);
+    padding-left: 12px;
+  }
+
+
+  .section-title {
+    font-size: 10.5px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    border-bottom: 1.5px solid var(--border);
+    padding-bottom: 6px;
+    margin-bottom: 14px;
+  }
+
+  .edu-item, .exp-item { margin-bottom: 16px; }
+  .edu-item:last-child, .exp-item:last-child { margin-bottom: 0; }
+
+  .item-header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .item-title { font-weight: 600; font-size: 13.5px; color: var(--dark); }
+  .item-date {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    white-space: nowrap;
+    margin-left: 8px;
+  }
+  .item-sub { font-size: 12.5px; color: var(--muted); margin-top: 1px; }
+  .item-desc { font-size: 12.5px; color: var(--mid); margin-top: 5px; line-height: 1.65; }
+
+  ul.bullets { padding-left: 16px; margin-top: 5px; display: flex; flex-direction: column; gap: 3px; }
+  ul.bullets li { font-size: 12.5px; color: var(--mid); line-height: 1.6; }
+  ul.bullets li::marker { color: var(--accent); }
+
+  .kw-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .kw {
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    font-size: 11.5px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-weight: 500;
+    border: 1px solid #c7d2fe;
+  }
+
+  @media print {
+    body { background: white; }
+    .page { margin: 0; box-shadow: none; border-radius: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ══════════════════ SIDEBAR ══════════════════ -->
+  <aside class="sidebar">
+
+    <!-- FOTO -->
+    <div class="photo-wrap">
+
+        <img src="Eu.jpg" alt="Gabriel Andrade"
+             style="width:170px;height:170px;border-radius:50%;border:3px solid #1a56db;object-fit:cover;">
+    </div>
+
+    <!-- CONTATO -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">Contato</div>
+      <div class="contact-item">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a56db" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Recife, PE — Brasil
+      </div>
+      <a href="https://w.app/8ugsj2" class="contact-item">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a56db" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.22 1.18 2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.56-.56a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+        (81) 9 9831-1633 
+      </a>
+      <a href="mailto:contato.gabriellandrade@gmail.com" class="contact-item">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a56db" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        gabriel@email.com 
+      </a>
+      <a href="https://www.linkedin.com/in/gabriel-andrade-37b97b324/" target="_blank" class="contact-item">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a56db" stroke-width="2"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        Linkedin
+      </a>
+      <a href="https://github.com/DevGabriel2809" target="_blank" class="contact-item">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a56db" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+        Github
+      </a>
+      <a href="https://gabrielandrade.vercel.app" target="_blank" class="contact-item">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a56db" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        Portifólio 
+      </a>
+    </div>
+
+    <!-- HABILIDADES TÉCNICAS -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">Habilidades</div>
+      <div class="skill-bar-wrap">
+        <div class="skill-row">
+          <div class="skill-name">JavaScript <span>Avançado</span></div>
+          <div class="skill-track"><div class="skill-fill" style="width:82%"></div></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-name">Python <span>Avançado</span></div>
+          <div class="skill-track"><div class="skill-fill" style="width:80%"></div></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-name">HTML5 <span>Avançado</span></div>
+          <div class="skill-track"><div class="skill-fill" style="width:88%"></div></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-name">CSS3 <span>Avançado</span></div>
+          <div class="skill-track"><div class="skill-fill" style="width:85%"></div></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-name">Redes / TCP-IP <span>Técnico</span></div>
+          <div class="skill-track"><div class="skill-fill" style="width:88%"></div></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-name">Linux <span>Intermediário</span></div>
+          <div class="skill-track"><div class="skill-fill" style="width:70%"></div></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-name">Git / GitHub <span>Intermediário</span></div>
+          <div class="skill-track"><div class="skill-fill" style="width:72%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FERRAMENTAS -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">Ferramentas &amp; Stack</div>
+      <div class="tag-list">
+        <span class="tag-dark">VS Code</span>
+        <span class="tag-dark">Git</span>
+        <span class="tag-dark">GitHub</span>
+        <span class="tag-dark">Linux</span>
+        <span class="tag-dark">Node.js</span>
+        <span class="tag-dark">REST API</span>
+        <span class="tag-dark">SQL</span>
+        <span class="tag-dark">Azure</span>
+        <span class="tag-dark">AWS</span>
+        <span class="tag-dark">DNS/DHCP</span>
+        <span class="tag-dark">TCP/IP</span>
+        <span class="tag-dark">Wireshark</span>
+      </div>
+    </div>
+
+    <!-- IDIOMAS -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">Idiomas</div>
+      <div class="lang-item">
+        <span>Português</span>
+        <span class="lang-level">Nativo</span>
+      </div>
+      <div class="lang-item">
+        <span>Inglês</span>
+        <span class="lang-level">C1 – EF SET</span>
+      </div>
+    </div>
+
+    <!-- OUTROS -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">Outros</div>
+      <div class="contact-item">CNH — Categoria A/B</div>
+    </div>
+
+  </aside>
+
+  <!-- ══════════════════ MAIN ══════════════════ -->
+  <main class="main">
+
+    <!-- CABEÇALHO -->
+    <div class="header-block">
+      <div class="name">Gabriel Andrade</div>
+      <div class="title-line">Bacharelando de Engenharia de Software · Desenvolvedor Web · Técnico em Redes</div>
+      <p class="summary">
+        Bacharelando de Engenharia de Software apaixonado por tecnologia, desenvolvimento de software e infraestrutura de redes. Com formação técnica em Redes de Computadores e experiência prática em desenvolvimento web (JavaScript, Python, HTML5, CSS3), combino raciocínio analítico sólido com habilidade de aprendizado rápido. Inglês fluente (C1 certificado) e forte aptidão para resolução de problemas complexos. Busco oportunidade de estágio ou trainee em T.I para aplicar e ampliar habilidades técnicas em ambiente dinâmico.
+      </p>
+    </div>
+
+    <!-- EDUCAÇÃO -->
+    <div class="section">
+      <div class="section-title">Educação</div>
+
+      <div class="edu-item">
+        <div class="item-header">
+          <div class="item-title">Bacharelado em Engenharia de Software</div>
+          <div class="item-date">2026 – cursando</div>
+        </div>
+        <div class="item-sub">Universidade Católica de Brasília (UCB) · 1° período</div>
+        <div class="item-desc">Ênfase em desenvolvimento de sistemas, algoritmos, estruturas de dados, programação orientada a objetos e engenharia de requisitos.</div>
+      </div>
+
+      <div class="edu-item">
+        <div class="item-header">
+          <div class="item-title">Técnico em Redes de Computadores</div>
+          <div class="item-date">Concluído</div>
+        </div>
+        <div class="item-sub">Escola Técnica Estadual Prof. Lucilo Ávila Pessoa (ETE-PE)</div>
+        <div class="item-desc">Formação técnica em infraestrutura de redes, protocolos TCP/IP, roteamento, switching, cabeamento estruturado, segurança de redes, DNS, DHCP, servidores Linux e Windows Server.</div>
+      </div>
+
+    </div>
+
+    <!-- PROJETOS / EXPERIÊNCIA TÉCNICA -->
+    <div class="section">
+      <div class="section-title">Projetos &amp; Experiência Técnica</div>
+
+      <div class="exp-item">
+        <div class="item-header">
+          <div class="item-title">Desenvolvimento Web Front-End</div>
+          <div class="item-date">Projetos pessoais</div>
+        </div>
+        <div class="item-sub">JavaScript · HTML5 · CSS3</div>
+        <ul class="bullets">
+          <li>Desenvolvimento de interfaces web responsivas com HTML5 semântico e CSS3 (Flexbox, Grid Layout, animações).</li>
+          <li>Implementação de lógica de aplicação com JavaScript vanilla, manipulação de DOM, eventos e consumo de APIs REST.</li>
+          <li>Boas práticas: componentização, clean code, versionamento com Git e GitHub.</li>
+        </ul>
+      </div>
+
+      <div class="exp-item">
+        <div class="item-header">
+          <div class="item-title">Scripts de Automação &amp; Análise de Dados</div>
+          <div class="item-date">Projetos pessoais</div>
+        </div>
+        <div class="item-sub">Python · Web Scraping · Automação</div>
+        <ul class="bullets">
+          <li>Criação de scripts Python para automação de tarefas repetitivas, processamento de arquivos e extração de dados.</li>
+          <li>Uso de bibliotecas como <code style="font-family:'DM Mono';font-size:11px;color:#1a56db;">requests</code>, <code style="font-family:'DM Mono';font-size:11px;color:#1a56db;">BeautifulSoup</code> e manipulação de JSON/CSV.</li>
+        </ul>
+      </div>
+
+      <div class="exp-item">
+        <div class="item-header">
+          <div class="item-title">Técnico em Redes &amp; Tecnologia da Informação</div>
+          <div class="item-date">Formação técnica</div>
+        </div>
+        <div class="item-sub">Redes · Cloud Computing · Banco de Dados · Lógica de Programação · Linux</div>
+        <ul class="bullets">
+          <li>Fundamentos de <strong>lógica de programação</strong>: algoritmos, estruturas condicionais, laços de repetição, funções e modularização — base aplicada diretamente no desenvolvimento com Python e JavaScript.</li>
+          <li>Introdução a <strong>Cloud Computing</strong> com Microsoft Azure e Amazon AWS: conceitos de IaaS, PaaS e SaaS, máquinas virtuais, armazenamento em nuvem, gerenciamento de acesso (IAM) e fundamentos de escalabilidade.</li>
+          <li>Modelagem e administração de <strong>banco de dados relacionais</strong>: criação de tabelas, relacionamentos, consultas SQL (SELECT, JOIN, WHERE, GROUP BY) e noções de normalização de dados.</li>
+          <li>Configuração e administração de infraestrutura de redes: roteadores, switches, VLANs, DNS, DHCP e diagnóstico de falhas com Wireshark.</li>
+          <li>Administração de servidores <strong>Linux</strong> (Ubuntu/Debian): gerenciamento de permissões, serviços, SSH e automação via shell script.</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- CERTIFICAÇÕES -->
+    <div class="section">
+      <div class="section-title">Certificações — Fundação Bradesco</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;">
+
+        <div style="display:flex;flex-direction:column;gap:2px;padding:8px 10px;border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:3px;">
+          <span style="font-size:12.5px;font-weight:600;color:var(--dark);">Banco de Dados</span>
+          <span style="font-size:11px;color:var(--muted);">38 horas · Trilha · Concluído ago/2025</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:2px;padding:8px 10px;border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:3px;">
+          <span style="font-size:12.5px;font-weight:600;color:var(--dark);">Modelagem de Dados</span>
+          <span style="font-size:11px;color:var(--muted);">On-line · Concluído ago/2025</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:2px;padding:8px 10px;border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:3px;">
+          <span style="font-size:12.5px;font-weight:600;color:var(--dark);">Desenvolvendo Aplicações Mobile com Android Studio</span>
+          <span style="font-size:11px;color:var(--muted);">On-line · Programação · Concluído jul/2025</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:2px;padding:8px 10px;border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:3px;">
+          <span style="font-size:12.5px;font-weight:600;color:var(--dark);">Microsoft Excel 2016 </span>
+          <span style="font-size:11px;color:var(--muted);">On-line · Produtividade · Concluído jul/2025</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:2px;padding:8px 10px;border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:3px;">
+          <span style="font-size:12.5px;font-weight:600;color:var(--dark);">Estratégia de Negócios</span>
+          <span style="font-size:11px;color:var(--muted);">On-line · Negócios e Inovação · Concluído jul/2025</span>
+        </div>
+
+
+      </div>
+    </div>
+
+    <!-- COMPETÊNCIAS-CHAVE (Keywords ATS) -->
+    <div class="section">
+      <div class="section-title">Competências</div>
+      <div class="kw-grid">
+        <span class="kw">Desenvolvimento Web</span>
+        <span class="kw">Front-End Development</span>
+        <span class="kw">Back-End Development</span>
+        <span class="kw">JavaScript</span>
+        <span class="kw">Python</span>
+        <span class="kw">HTML5 / CSS3</span>
+        <span class="kw">SQL</span>
+        <span class="kw">Banco de Dados Relacional</span>
+        <span class="kw">Cloud Computing</span>
+        <span class="kw">Microsoft Azure</span>
+        <span class="kw">Amazon AWS</span>
+        <span class="kw">Lógica de Programação</span>
+        <span class="kw">Engenharia de Software</span>
+        <span class="kw">Programação Orientada a Objetos</span>
+        <span class="kw">Algoritmos e Estrutura de Dados</span>
+        <span class="kw">REST APIs</span>
+        <span class="kw">Git / GitHub</span>
+        <span class="kw">Versionamento de Código</span>
+        <span class="kw">Redes de Computadores</span>
+        <span class="kw">TCP/IP</span>
+        <span class="kw">Infraestrutura de TI</span>
+        <span class="kw">Linux</span>
+        <span class="kw">Segurança de Redes</span>
+        <span class="kw">Suporte Técnico</span>
+        <span class="kw">Raciocínio Lógico</span>
+        <span class="kw">Resolução de Problemas</span>
+        <span class="kw">Trabalho em Equipe</span>
+        <span class="kw">Metodologias Ágeis</span>
+        <span class="kw">Scrum / Kanban</span>
+        <span class="kw">Comunicação Técnica</span>
+        <span class="kw">Inglês Técnico C1</span>
+        <span class="kw">Aprendizado Contínuo</span>
+      </div>
+    </div>
+
+  </main>
+</div>
+</body>
+</html>
