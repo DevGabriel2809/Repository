@@ -221,3 +221,53 @@
     width: 100%;
   }
 }
+
+/* ── BOTÃO LIMPAR LISTA / SCROLL DA TABELA ── */
+.clear-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,79,79,0.08);
+  border: 1px solid rgba(255,79,79,0.28);
+  color: var(--red);
+  border-radius: 20px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-family: 'DM Mono', monospace;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform .2s ease, border-color .2s ease, background .2s ease, opacity .2s ease;
+}
+
+.clear-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255,79,79,0.65);
+  background: rgba(255,79,79,0.14);
+}
+
+.clear-btn:disabled {
+  opacity: .65;
+  cursor: wait;
+  transform: none;
+}
+
+.clear-btn.is-loading span:first-child {
+  animation: refreshSpin .8s linear infinite;
+}
+
+.table-wrap {
+  max-height: 460px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.table-wrap table {
+  margin: 0;
+}
+
+.table-wrap thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}

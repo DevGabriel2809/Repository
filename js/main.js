@@ -124,64 +124,112 @@ window.addEventListener('scroll', () => {
 //  5. Cole este bloco no seu main.js (ou no <script> do index.html)
 // =========================================================
 
-const SUPABASE_URL =  'https://upzxedxfifhvdhwlphvw.supabase.co'
-const SUPABASE_KEY = 'sb_publishable_2tx3XDBRHeRgp7KVolM2QA_a9JPO3Qw';  
+// Configuração pública do Supabase usada somente como fallback.
+// O registro principal acontece pela rota /api/track, que roda no servidor da Vercel.
+const SUPABASE_URL = 'https://upzxedxfifhvdhwlphvw.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_2tx3XDBRHeRgp7KVolM2QA_a9JPO3Qw';
 
-async function registrarVisita() {
-  try {
-    // Evita duplicar acesso na mesma aba/sessão ao recarregar a página.
-    const chaveSessao = 'visita_registrada_' + new Date().toISOString().slice(0, 10);
-    if (sessionStorage.getItem(chaveSessao)) return;
+function detectarDispositivo() {
+  return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'mobile' : 'desktop';
+}
 
-    // Pega dados de geolocalização pelo IP.
-    let geo = {};
-    try {
-      const geoRes = await fetch('https://ipapi.co/json/');
-      if (geoRes.ok) geo = await geoRes.json();
-    } catch (geoError) {
-      console.warn('[tracking] Não foi possível obter geolocalização:', geoError.message);
-    }
+function montarDadosBasicosDaVisita() {
+  return {
+    dispositivo: detectarDispositivo(),
+    navegador: navigator.userAgent.slice(0, 120),
+    pagina: window.location.pathname || '/',
+    referrer: document.referrer || 'direto'
+  };
+}
 
-    const visita = {
-      ip:           geo.ip || 'desconhecido',
-      cidade:       geo.city || 'desconhecida',
-      regiao:       geo.region || 'desconhecida',
-      pais:         geo.country_name || 'desconhecido',
-      pais_codigo:  geo.country_code || '--',
-      latitude:     geo.latitude || null,
-      longitude:    geo.longitude || null,
-      dispositivo:  /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
-      navegador:    navigator.userAgent.slice(0, 120),
-      pagina:       window.location.pathname || '/',
-      referrer:     document.referrer || 'direto'
-    };
+async function salvarVisitaDiretoNoSupabase(visita) {
+  const resposta = await fetch(`${SUPABASE_URL}/rest/v1/visitas`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Prefer': 'return=minimal',
+    },
+    body: JSON.stringify(visita),
+  });
 
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/visitas`, {
-      method: 'POST',
-      headers: {
-        'Content-Type':  'application/json',
-        'apikey':        SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Prefer':        'return=minimal',
-      },
-      body: JSON.stringify(visita),
-    });
-
-    if (!res.ok) {
-      const erro = await res.text();
-      console.error('[tracking] Supabase recusou o registro:', res.status, erro);
-      return;
-    }
-
-    sessionStorage.setItem(chaveSessao, 'true');
-    console.info('[tracking] visita registrada com sucesso');
-
-  } catch (e) {
-    console.error('[tracking] erro ao registrar visita:', e);
+  if (!resposta.ok) {
+    const erro = await resposta.text();
+    throw new Error(`Supabase recusou o registro: ${resposta.status} ${erro}`);
   }
 }
 
-// Registra a visita quando o site termina de carregar.
+async function registrarVisitaViaServidor() {
+  const resposta = await fetch('/api/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(montarDadosBasicosDaVisita()),
+  });
+
+  let payload = null;
+  try {
+    payload = await resposta.json();
+  } catch (_) {
+    payload = null;
+  }
+
+  if (!resposta.ok) {
+    throw new Error(payload?.details || payload?.error || `Servidor retornou ${resposta.status}`);
+  }
+
+  return payload;
+}
+
+async function registrarVisitaFallbackNavegador() {
+  const geoResposta = await fetch('https://ipapi.co/json/');
+
+  if (!geoResposta.ok) {
+    throw new Error(`ipapi.co retornou ${geoResposta.status}`);
+  }
+
+  const geo = await geoResposta.json();
+
+  // Não grava registros sujos. Se a API não retornar IP e país, cancela.
+  if (!geo || !geo.ip || !geo.country_name || !geo.country_code) {
+    throw new Error('ipapi.co não retornou dados mínimos de geolocalização');
+  }
+
+  const visita = {
+    ip: geo.ip,
+    cidade: geo.city || 'Não identificado',
+    regiao: geo.region || 'Não identificado',
+    pais: geo.country_name,
+    pais_codigo: geo.country_code,
+    latitude: geo.latitude || null,
+    longitude: geo.longitude || null,
+    ...montarDadosBasicosDaVisita(),
+  };
+
+  await salvarVisitaDiretoNoSupabase(visita);
+  return { ok: true, source: 'browser-fallback', visita };
+}
+
+async function registrarVisita() {
+  try {
+    // Caminho principal: servidor da Vercel, sem CORS das APIs de geolocalização.
+    const resultado = await registrarVisitaViaServidor();
+    console.info('[tracking] visita registrada pelo servidor:', resultado?.visita || resultado);
+    return;
+  } catch (erroServidor) {
+    console.warn('[tracking] rota /api/track falhou. Tentando fallback no navegador:', erroServidor.message);
+  }
+
+  try {
+    // Fallback para quando você testar fora da Vercel. Nunca grava "desconhecido".
+    const resultadoFallback = await registrarVisitaFallbackNavegador();
+    console.info('[tracking] visita registrada pelo fallback:', resultadoFallback.visita);
+  } catch (erroFallback) {
+    console.warn('[tracking] visita não registrada:', erroFallback.message);
+  }
+}
+
+// Registra um acesso a cada carregamento real da página.
 window.addEventListener('load', registrarVisita);
 
 // =========================================================

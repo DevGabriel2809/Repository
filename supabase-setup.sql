@@ -1,6 +1,6 @@
 -- =========================================================
 -- SUPABASE SETUP — PORTFÓLIO / TRACKING DE VISITAS
--- Rode este arquivo no Supabase em: SQL Editor > New query > Run
+-- Rode no Supabase: SQL Editor > New query > Run
 -- =========================================================
 
 create table if not exists public.visitas (
@@ -21,26 +21,41 @@ create table if not exists public.visitas (
 
 alter table public.visitas enable row level security;
 
--- Limpa políticas antigas com os mesmos nomes, caso você rode o script mais de uma vez.
+-- Limpa políticas antigas para evitar conflito ao rodar o script mais de uma vez.
 drop policy if exists "Permitir insert publico de visitas" on public.visitas;
 drop policy if exists "Permitir leitura publica das visitas" on public.visitas;
+drop policy if exists "Permitir limpeza publica das visitas" on public.visitas;
 
--- Permite que visitantes gravem acessos usando a publishable key.
+-- Visitantes podem registrar acessos usando a publishable key.
 create policy "Permitir insert publico de visitas"
 on public.visitas
 for insert
 to anon
 with check (true);
 
--- ATENÇÃO: isso deixa a leitura disponível para o painel admin estático funcionar.
--- Para produção real, o ideal é usar Supabase Auth/Edge Function e não expor SELECT público.
+-- O painel admin estático precisa ler os registros.
 create policy "Permitir leitura publica das visitas"
 on public.visitas
 for select
 to anon
 using (true);
 
--- Garante privilégios REST para a role anon.
+-- O botão "Limpar lista" do painel admin precisa apagar os registros.
+create policy "Permitir limpeza publica das visitas"
+on public.visitas
+for delete
+to anon
+using (true);
+
+-- Privilégios REST para a role anon.
 grant usage on schema public to anon;
-grant insert, select on table public.visitas to anon;
+grant insert, select, delete on table public.visitas to anon;
 grant usage, select on sequence public.visitas_id_seq to anon;
+
+-- Limpa registros ruins gerados por versões antigas do tracking.
+delete from public.visitas
+where ip is null
+   or lower(coalesce(ip, '')) in ('desconhecido', 'desconhecida', 'não identificado', 'nao identificado')
+   or lower(coalesce(pais, '')) in ('desconhecido', 'desconhecida')
+   or lower(coalesce(cidade, '')) in ('desconhecido', 'desconhecida')
+   or coalesce(pais_codigo, '') = '--';

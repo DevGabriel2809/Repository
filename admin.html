@@ -33,6 +33,10 @@
         <span class="refresh-icon" aria-hidden="true">↻</span>
         <span id="btn-refresh-text">Atualizar dados</span>
       </button>
+      <button class="clear-btn" id="btn-clear" onclick="limparAcessos()" type="button">
+        <span aria-hidden="true">🗑</span>
+        <span id="btn-clear-text">Limpar lista</span>
+      </button>
       <span class="refresh-status" id="refresh-status">Atualização manual disponível</span>
       <button class="lang-btn" id="lang-btn-admin" onclick="toggleAdminLang()">🇺🇸 EN</button>
       <button class="btn-sair" id="btn-sair" onclick="sair()">Sair</button>
@@ -90,6 +94,11 @@ const adminI18n = {
     erroSenha: 'Senha incorreta.',
     btnSair: 'Sair',
     btnAtualizar: 'Atualizar dados',
+    btnLimpar: 'Limpar lista',
+    confirmLimpar: 'Tem certeza que deseja apagar todos os acessos registrados?',
+    limpando: 'Limpando lista...',
+    listaLimpa: 'Lista limpa às',
+    erroLimpar: 'Erro ao limpar lista.',
     atualizacaoDisponivel: 'Atualização manual disponível',
     atualizando: 'Atualizando...',
     atualizadoAs: 'Atualizado às',
@@ -121,6 +130,11 @@ const adminI18n = {
     erroSenha: 'Incorrect password.',
     btnSair: 'Sign Out',
     btnAtualizar: 'Refresh data',
+    btnLimpar: 'Clear list',
+    confirmLimpar: 'Are you sure you want to delete all recorded visits?',
+    limpando: 'Clearing list...',
+    listaLimpa: 'List cleared at',
+    erroLimpar: 'Failed to clear list.',
     atualizacaoDisponivel: 'Manual refresh available',
     atualizando: 'Refreshing...',
     atualizadoAs: 'Updated at',
@@ -159,6 +173,8 @@ function applyAdminLang(lang) {
   document.getElementById('login-erro').textContent = t.erroSenha;
   document.getElementById('btn-sair').textContent = t.btnSair;
   document.getElementById('btn-refresh-text').textContent = t.btnAtualizar;
+  const clearText = document.getElementById('btn-clear-text');
+  if (clearText) clearText.textContent = t.btnLimpar;
   const refreshStatus = document.getElementById('refresh-status');
   if (refreshStatus && !refreshStatus.dataset.lastUpdate) {
     refreshStatus.textContent = t.atualizacaoDisponivel;
@@ -249,16 +265,32 @@ function sair() {
 function setRefreshState(isLoading) {
   const t = adminI18n[adminLang];
   const btn = document.getElementById('btn-refresh');
+  const clearBtn = document.getElementById('btn-clear');
   const status = document.getElementById('refresh-status');
 
   if (!btn || !status) return;
 
   btn.disabled = isLoading;
   btn.classList.toggle('is-loading', isLoading);
+  if (clearBtn) clearBtn.disabled = isLoading;
 
   if (isLoading) {
     status.textContent = t.atualizando;
   }
+}
+
+function setClearState(isLoading) {
+  const t = adminI18n[adminLang];
+  const refreshBtn = document.getElementById('btn-refresh');
+  const clearBtn = document.getElementById('btn-clear');
+  const status = document.getElementById('refresh-status');
+
+  if (refreshBtn) refreshBtn.disabled = isLoading;
+  if (clearBtn) {
+    clearBtn.disabled = isLoading;
+    clearBtn.classList.toggle('is-loading', isLoading);
+  }
+  if (status && isLoading) status.textContent = t.limpando;
 }
 
 function setLastUpdateStatus() {
@@ -278,6 +310,56 @@ function setLastUpdateStatus() {
 
 function atualizarDados() {
   carregarDados();
+}
+
+function renderizarVazio() {
+  const t = adminI18n[adminLang];
+  document.getElementById('total-visitas').textContent = '0';
+  document.getElementById('total-unicos').textContent = '0';
+  document.getElementById('total-paises').textContent = '0';
+  document.getElementById('total-mobile').textContent = '0';
+  document.getElementById('paises-grid').innerHTML = `<div class="loading"><span>🌍</span>${t.semPaises}</div>`;
+  document.getElementById('tabela-body').innerHTML = `<tr><td colspan="6" class="loading"><span>📭</span>${t.semAcessos}</td></tr>`;
+}
+
+async function limparAcessos() {
+  const t = adminI18n[adminLang];
+  if (!confirm(t.confirmLimpar)) return;
+
+  setClearState(true);
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/visitas?id=not.is.null`, {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Prefer': 'return=minimal',
+      }
+    });
+
+    if (!res.ok) {
+      const erroTexto = await res.text();
+      throw new Error(`Supabase retornou ${res.status}: ${erroTexto}`);
+    }
+
+    renderizarVazio();
+    const status = document.getElementById('refresh-status');
+    const hora = new Date().toLocaleTimeString(adminLang === 'pt' ? 'pt-BR' : 'en-US', {
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+    if (status) {
+      status.dataset.lastUpdate = hora;
+      status.textContent = `${t.listaLimpa} ${hora}`;
+    }
+  } catch (e) {
+    console.error('[admin] erro ao limpar acessos:', e);
+    const status = document.getElementById('refresh-status');
+    if (status) status.textContent = `${t.erroLimpar} ${e.message}`;
+    alert(`${t.erroLimpar}
+${e.message}`);
+  } finally {
+    setClearState(false);
+  }
 }
 
 async function carregarDados() {
@@ -393,6 +475,7 @@ document.querySelectorAll('a, button').forEach(el => {
 window.entrar = entrar;
 window.sair = sair;
 window.atualizarDados = atualizarDados;
+window.limparAcessos = limparAcessos;
 window.toggleAdminLang = toggleAdminLang;
 
 // Aplica idioma e restaura sessão na carga
