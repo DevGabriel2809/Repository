@@ -18,7 +18,7 @@
   --glow: 0 0 40px rgba(0,229,204,0.15);
   }
   html { scroll-behavior: smooth; }
-  body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--white); min-height: 100vh; }
+  body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--white); min-height: 100vh; cursor: none;}
 .cursor { position:fixed; width:10px; height:10px; background:var(--cyan); border-radius:50%; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); transition:transform 0.1s; mix-blend-mode:difference; }
 .cursor-ring { position:fixed; width:36px; height:36px; border:1.5px solid rgba(0,229,204,0.5); border-radius:50%; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:all 0.15s ease; }
 
@@ -45,7 +45,6 @@
   .btn-entrar {
     background: var(--cyan); color: #080b10; font-weight: 700;
     border: none; border-radius: 8px; padding: 12px; font-size: 15px;
-    cursor: pointer; font-family: 'Syne', sans-serif; transition: opacity .2s;
   }
   .btn-entrar:hover { opacity: .85; }
   .login-erro { color: var(--red); font-size: 13px; text-align: center; display: none; }
@@ -62,7 +61,6 @@
   .logo span { color: var(--cyan); }
   .btn-sair {
     background: transparent; border: 1px solid var(--border); color: var(--muted);
-    border-radius: 8px; padding: 8px 16px; cursor: pointer; font-size: 13px;
     font-family: 'Outfit', sans-serif; transition: all .2s;
   }
   .btn-sair:hover { border-color: var(--red); color: var(--red); }
@@ -141,7 +139,6 @@
     padding: 6px 14px;
     font-size: 12px;
     font-family: 'DM Mono', monospace;
-    cursor: pointer;
     white-space: nowrap;
     transition: all 0.2s ease;
   }
