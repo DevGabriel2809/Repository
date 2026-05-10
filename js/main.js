@@ -134,25 +134,34 @@ const SUPABASE_KEY = 'sb_publishable_2tx3XDBRHeRgp7KVolM2QA_a9JPO3Qw';
 
 async function registrarVisita() {
   try {
-    // Pega dados de geolocalização pelo IP 
-    const geo = await fetch('https://ipapi.co/json/').then(r => r.json());
+    // Evita duplicar acesso na mesma aba/sessão ao recarregar a página.
+    const chaveSessao = 'visita_registrada_' + new Date().toISOString().slice(0, 10);
+    if (sessionStorage.getItem(chaveSessao)) return;
+
+    // Pega dados de geolocalização pelo IP.
+    let geo = {};
+    try {
+      const geoRes = await fetch('https://ipapi.co/json/');
+      if (geoRes.ok) geo = await geoRes.json();
+    } catch (geoError) {
+      console.warn('[tracking] Não foi possível obter geolocalização:', geoError.message);
+    }
 
     const visita = {
-      ip:         geo.ip         || 'desconhecido',
-      cidade:     geo.city       || 'desconhecida',
-      regiao:     geo.region     || 'desconhecida',
-      pais:       geo.country_name || 'desconhecido',
-      pais_codigo: geo.country_code || '--',
-      latitude:   geo.latitude   || null,
-      longitude:  geo.longitude  || null,
-      dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
-      navegador:  navigator.userAgent.slice(0, 120),
-      pagina:     window.location.pathname,
-      referrer:   document.referrer || 'direto',
-      // visitado_em é preenchido automaticamente pelo Supabase (now())
+      ip:           geo.ip || 'desconhecido',
+      cidade:       geo.city || 'desconhecida',
+      regiao:       geo.region || 'desconhecida',
+      pais:         geo.country_name || 'desconhecido',
+      pais_codigo:  geo.country_code || '--',
+      latitude:     geo.latitude || null,
+      longitude:    geo.longitude || null,
+      dispositivo:  /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
+      navegador:    navigator.userAgent.slice(0, 120),
+      pagina:       window.location.pathname || '/',
+      referrer:     document.referrer || 'direto'
     };
 
-    await fetch(`${SUPABASE_URL}/rest/v1/visitas`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/visitas`, {
       method: 'POST',
       headers: {
         'Content-Type':  'application/json',
@@ -163,11 +172,22 @@ async function registrarVisita() {
       body: JSON.stringify(visita),
     });
 
+    if (!res.ok) {
+      const erro = await res.text();
+      console.error('[tracking] Supabase recusou o registro:', res.status, erro);
+      return;
+    }
+
+    sessionStorage.setItem(chaveSessao, 'true');
+    console.info('[tracking] visita registrada com sucesso');
+
   } catch (e) {
-    // Falha silenciosa — não quebra o site se algo der errado
-    console.warn('[tracking] erro ao registrar visita:', e.message);
+    console.error('[tracking] erro ao registrar visita:', e);
   }
 }
+
+// Registra a visita quando o site termina de carregar.
+window.addEventListener('load', registrarVisita);
 
 // =========================================================
 // 06. SISTEMA DE IDIOMAS (i18n) — PT-BR / EN

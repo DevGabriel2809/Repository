@@ -205,9 +205,27 @@ async function carregarDados() {
       `${SUPABASE_URL}/rest/v1/visitas?select=*&order=visitado_em.desc&limit=500`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
     );
+
+    if (!res.ok) {
+      const erro = await res.text();
+      console.error('[admin] Erro ao consultar Supabase:', res.status, erro);
+      document.getElementById('tabela-body').innerHTML =
+        `<tr><td colspan="6" class="loading"><span>❌</span>Erro ${res.status}: verifique tabela, RLS e políticas no Supabase.</td></tr>`;
+      return;
+    }
+
     const visitas = await res.json();
+
+    if (!Array.isArray(visitas)) {
+      console.error('[admin] Resposta inesperada do Supabase:', visitas);
+      document.getElementById('tabela-body').innerHTML =
+        `<tr><td colspan="6" class="loading"><span>❌</span>Resposta inesperada do Supabase. Abra o console para ver detalhes.</td></tr>`;
+      return;
+    }
+
     renderizarDados(visitas);
   } catch(e) {
+    console.error('[admin] Falha ao carregar dados:', e);
     document.getElementById('tabela-body').innerHTML =
       `<tr><td colspan="6" class="loading"><span>❌</span>${t.erroBanco}</td></tr>`;
   }
