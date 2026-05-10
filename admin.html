@@ -28,7 +28,12 @@
 
   <header>
     <div class="logo">&lt;<span>Admin</span> /&gt;</div>
-    <div style="display:flex;gap:12px;align-items:center;">
+    <div class="admin-actions">
+      <button class="refresh-btn" id="btn-refresh" onclick="atualizarDados()" type="button">
+        <span class="refresh-icon" aria-hidden="true">↻</span>
+        <span id="btn-refresh-text">Atualizar dados</span>
+      </button>
+      <span class="refresh-status" id="refresh-status">Atualização manual disponível</span>
       <button class="lang-btn" id="lang-btn-admin" onclick="toggleAdminLang()">🇺🇸 EN</button>
       <button class="btn-sair" id="btn-sair" onclick="sair()">Sair</button>
     </div>
@@ -84,6 +89,10 @@ const adminI18n = {
     btnEntrar: 'Entrar',
     erroSenha: 'Senha incorreta.',
     btnSair: 'Sair',
+    btnAtualizar: 'Atualizar dados',
+    atualizacaoDisponivel: 'Atualização manual disponível',
+    atualizando: 'Atualizando...',
+    atualizadoAs: 'Atualizado às',
     statAcessos: 'Total de Acessos',
     statUnicos: 'IPs Únicos',
     statPaises: 'Países',
@@ -111,6 +120,10 @@ const adminI18n = {
     btnEntrar: 'Sign In',
     erroSenha: 'Incorrect password.',
     btnSair: 'Sign Out',
+    btnAtualizar: 'Refresh data',
+    atualizacaoDisponivel: 'Manual refresh available',
+    atualizando: 'Refreshing...',
+    atualizadoAs: 'Updated at',
     statAcessos: 'Total Visits',
     statUnicos: 'Unique IPs',
     statPaises: 'Countries',
@@ -145,6 +158,11 @@ function applyAdminLang(lang) {
   document.getElementById('btn-entrar').textContent = t.btnEntrar;
   document.getElementById('login-erro').textContent = t.erroSenha;
   document.getElementById('btn-sair').textContent = t.btnSair;
+  document.getElementById('btn-refresh-text').textContent = t.btnAtualizar;
+  const refreshStatus = document.getElementById('refresh-status');
+  if (refreshStatus && !refreshStatus.dataset.lastUpdate) {
+    refreshStatus.textContent = t.atualizacaoDisponivel;
+  }
   document.getElementById('stat-label-acessos').textContent = t.statAcessos;
   document.getElementById('stat-label-unicos').textContent = t.statUnicos;
   document.getElementById('stat-label-paises').textContent = t.statPaises;
@@ -177,13 +195,43 @@ const BANDEIRAS = {
 };
 function bandeira(code) { return BANDEIRAS[code] || '🏳️'; }
 
+// ── SESSÃO ADMIN ──
+// Mantém o dashboard aberto por algumas horas para você não precisar logar a cada atualização.
+// Observação: como este painel é estático, isso é uma conveniência visual, não autenticação robusta de produção.
+const ADMIN_SESSION_KEY = 'devgabriel_admin_session_until';
+const ADMIN_SESSION_DURATION_MS = 8 * 60 * 60 * 1000; // 8 horas
+
+function salvarSessaoAdmin() {
+  const expiresAt = Date.now() + ADMIN_SESSION_DURATION_MS;
+  localStorage.setItem(ADMIN_SESSION_KEY, String(expiresAt));
+}
+
+function limparSessaoAdmin() {
+  localStorage.removeItem(ADMIN_SESSION_KEY);
+}
+
+function sessaoAdminValida() {
+  const expiresAt = Number(localStorage.getItem(ADMIN_SESSION_KEY) || 0);
+  return expiresAt > Date.now();
+}
+
+function mostrarDashboard() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+}
+
+function mostrarLogin() {
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
 async function entrar() {
   const v = document.getElementById('senha-input').value;
   const erro = document.getElementById('login-erro');
   const hash = await sha256(v);
   if (hash === SENHA_HASH) {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'block';
+    salvarSessaoAdmin();
+    mostrarDashboard();
     carregarDados();
   } else {
     erro.style.display = 'block';
@@ -193,13 +241,49 @@ async function entrar() {
 document.getElementById('senha-input').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
 
 function sair() {
-  document.getElementById('dashboard').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
+  limparSessaoAdmin();
+  mostrarLogin();
   document.getElementById('senha-input').value = '';
+}
+
+function setRefreshState(isLoading) {
+  const t = adminI18n[adminLang];
+  const btn = document.getElementById('btn-refresh');
+  const status = document.getElementById('refresh-status');
+
+  if (!btn || !status) return;
+
+  btn.disabled = isLoading;
+  btn.classList.toggle('is-loading', isLoading);
+
+  if (isLoading) {
+    status.textContent = t.atualizando;
+  }
+}
+
+function setLastUpdateStatus() {
+  const t = adminI18n[adminLang];
+  const status = document.getElementById('refresh-status');
+  if (!status) return;
+
+  const hora = new Date().toLocaleTimeString(adminLang === 'pt' ? 'pt-BR' : 'en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+
+  status.dataset.lastUpdate = hora;
+  status.textContent = `${t.atualizadoAs} ${hora}`;
+}
+
+function atualizarDados() {
+  carregarDados();
 }
 
 async function carregarDados() {
   const t = adminI18n[adminLang];
+  setRefreshState(true);
+
   try {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/visitas?select=*&order=visitado_em.desc&limit=500`,
@@ -207,27 +291,24 @@ async function carregarDados() {
     );
 
     if (!res.ok) {
-      const erro = await res.text();
-      console.error('[admin] Erro ao consultar Supabase:', res.status, erro);
-      document.getElementById('tabela-body').innerHTML =
-        `<tr><td colspan="6" class="loading"><span>❌</span>Erro ${res.status}: verifique tabela, RLS e políticas no Supabase.</td></tr>`;
-      return;
+      const erroTexto = await res.text();
+      throw new Error(`Supabase retornou ${res.status}: ${erroTexto}`);
     }
 
     const visitas = await res.json();
 
     if (!Array.isArray(visitas)) {
-      console.error('[admin] Resposta inesperada do Supabase:', visitas);
-      document.getElementById('tabela-body').innerHTML =
-        `<tr><td colspan="6" class="loading"><span>❌</span>Resposta inesperada do Supabase. Abra o console para ver detalhes.</td></tr>`;
-      return;
+      throw new Error('Resposta inesperada do Supabase. Era esperado um array de visitas.');
     }
 
     renderizarDados(visitas);
+    setLastUpdateStatus();
   } catch(e) {
-    console.error('[admin] Falha ao carregar dados:', e);
+    console.error('[admin] erro ao carregar dados:', e);
     document.getElementById('tabela-body').innerHTML =
-      `<tr><td colspan="6" class="loading"><span>❌</span>${t.erroBanco}</td></tr>`;
+      `<tr><td colspan="6" class="loading"><span>❌</span>${t.erroBanco}<br><small>${e.message}</small></td></tr>`;
+  } finally {
+    setRefreshState(false);
   }
 }
 
@@ -308,8 +389,21 @@ document.querySelectorAll('a, button').forEach(el => {
     ring.style.borderColor = 'rgba(0,229,204,0.5)';
   });
 });
-// Aplica idioma na carga
+// Exposição global para os botões inline do HTML
+window.entrar = entrar;
+window.sair = sair;
+window.atualizarDados = atualizarDados;
+window.toggleAdminLang = toggleAdminLang;
+
+// Aplica idioma e restaura sessão na carga
 applyAdminLang(adminLang);
+
+if (sessaoAdminValida()) {
+  mostrarDashboard();
+  carregarDados();
+} else {
+  mostrarLogin();
+}
 </script>
 </body>
 </html><!-- lang-btn CSS já está no admin.css, mas precisamos garantir que está lá -->

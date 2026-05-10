@@ -144,3 +144,80 @@
   }
   .lang-btn:hover { border-color: var(--cyan); color: var(--cyan); }
 
+
+
+/* ── AÇÕES DO ADMIN / ATUALIZAÇÃO MANUAL ── */
+.admin-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--cyan-dim);
+  border: 1px solid rgba(0,229,204,0.25);
+  color: var(--cyan);
+  border-radius: 20px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-family: 'DM Mono', monospace;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform .2s ease, border-color .2s ease, background .2s ease, opacity .2s ease;
+}
+
+.refresh-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(0,229,204,0.6);
+  background: rgba(0,229,204,0.16);
+}
+
+.refresh-btn:disabled {
+  opacity: .65;
+  cursor: wait;
+  transform: none;
+}
+
+.refresh-icon {
+  display: inline-flex;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.refresh-btn.is-loading .refresh-icon {
+  animation: refreshSpin .8s linear infinite;
+}
+
+.refresh-status {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  min-width: 150px;
+}
+
+@keyframes refreshSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 720px) {
+  header {
+    align-items: flex-start;
+    gap: 14px;
+    flex-direction: column;
+  }
+
+  .admin-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .refresh-status {
+    width: 100%;
+  }
+}
