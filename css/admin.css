@@ -1,0 +1,149 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #080b10; --bg2: #0d1117; --bg3: #111820;
+    --cyan: #00e5cc; --cyan-dim: rgba(0,229,204,0.10);
+    --orange: #ff7b2e; --white: #f0f4f8; --muted: #7a8899;
+    --border: rgba(255,255,255,0.07); --card: rgba(255,255,255,0.03);
+    --red: #ff4f4f; --green: #4fff9b;
+      --bg: #080b10;
+  --bg2: #0d1117;
+  --bg3: #111820;
+  --cyan: #00e5cc;
+  --cyan-dim: rgba(0,229,204,0.12);
+  --orange: #ff7b2e;
+  --white: #f0f4f8;
+  --muted: #7a8899;
+  --border: rgba(255,255,255,0.07);
+  --card: rgba(255,255,255,0.03);
+  --glow: 0 0 40px rgba(0,229,204,0.15);
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--white); min-height: 100vh; }
+.cursor { position:fixed; width:10px; height:10px; background:var(--cyan); border-radius:50%; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); transition:transform 0.1s; mix-blend-mode:difference; }
+.cursor-ring { position:fixed; width:36px; height:36px; border:1.5px solid rgba(0,229,204,0.5); border-radius:50%; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:all 0.15s ease; }
+
+  /* ── LOGIN ── */
+  #login-screen {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; flex-direction: column; gap: 24px;
+  }
+  #login-screen h1 { font-family: 'Syne', sans-serif; font-size: 28px; }
+  #login-screen h1 span { color: var(--cyan); }
+  .login-box {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 16px; padding: 40px 48px; display: flex;
+    flex-direction: column; gap: 16px; min-width: 320px;
+  }
+  .login-box label { font-size: 13px; color: var(--muted); letter-spacing: .5px; }
+  .login-box input {
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--white); border-radius: 8px; padding: 10px 14px;
+    font-size: 15px; font-family: 'DM Mono', monospace; outline: none;
+    transition: border-color .2s;
+  }
+  .login-box input:focus { border-color: var(--cyan); }
+  .btn-entrar {
+    background: var(--cyan); color: #080b10; font-weight: 700;
+    border: none; border-radius: 8px; padding: 12px; font-size: 15px;
+    cursor: pointer; font-family: 'Syne', sans-serif; transition: opacity .2s;
+  }
+  .btn-entrar:hover { opacity: .85; }
+  .login-erro { color: var(--red); font-size: 13px; text-align: center; display: none; }
+
+  /* ── DASHBOARD ── */
+  #dashboard { display: none; }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 40px; border-bottom: 1px solid var(--border);
+    background: var(--bg2); position: sticky; top: 0; z-index: 10;
+  }
+  .logo { font-family: 'Syne', sans-serif; font-size: 18px; }
+  .logo span { color: var(--cyan); }
+  .btn-sair {
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    border-radius: 8px; padding: 8px 16px; cursor: pointer; font-size: 13px;
+    font-family: 'Outfit', sans-serif; transition: all .2s;
+  }
+  .btn-sair:hover { border-color: var(--red); color: var(--red); }
+
+  main { padding: 40px; max-width: 1200px; margin: 0 auto; }
+
+  /* ── CARDS ESTATÍSTICAS ── */
+  .stats-row {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px; margin-bottom: 40px;
+  }
+  .stat-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px; text-align: center;
+  }
+  .stat-card .s-num { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; color: var(--cyan); }
+  .stat-card .s-label { font-size: 12px; color: var(--muted); margin-top: 4px; letter-spacing: .5px; text-transform: uppercase; }
+
+  /* ── SEÇÕES ── */
+  .section-title {
+    font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+    color: var(--muted); text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+
+  /* ── TABELA ── */
+  .table-wrap { overflow-x: auto; margin-bottom: 48px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    text-align: left; padding: 10px 14px; font-family: 'DM Mono', monospace;
+    font-size: 11px; color: var(--muted); letter-spacing: .5px;
+    background: var(--bg3); border-bottom: 1px solid var(--border);
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+  tbody tr:hover { background: var(--cyan-dim); }
+  tbody td { padding: 12px 14px; color: var(--white); vertical-align: middle; }
+  .flag { font-size: 18px; }
+  .badge {
+    display: inline-block; padding: 2px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; font-family: 'DM Mono', monospace;
+  }
+  .badge-mobile { background: rgba(255,123,46,.15); color: var(--orange); }
+  .badge-desktop { background: var(--cyan-dim); color: var(--cyan); }
+  .mono { font-family: 'DM Mono', monospace; color: var(--muted); font-size: 12px; }
+
+  /* ── PAISES ── */
+  .paises-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 48px; }
+  .pais-chip {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 8px 18px; font-size: 13px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .pais-chip .count {
+    background: var(--cyan-dim); color: var(--cyan);
+    border-radius: 10px; padding: 1px 8px; font-size: 11px;
+    font-family: 'DM Mono', monospace; font-weight: 700;
+  }
+
+  /* ── LOADING / VAZIO ── */
+  .loading { text-align: center; padding: 60px; color: var(--muted); font-size: 14px; }
+  .loading span { display: block; font-size: 32px; margin-bottom: 12px; }
+
+  /* ── RESPONSIVO ── */
+  @media (max-width: 600px) {
+    header { padding: 16px 20px; }
+    main { padding: 20px; }
+    .login-box { padding: 28px 24px; }
+  }
+
+  /* ── BOTÃO DE IDIOMA ── */
+  .lang-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+  }
+  .lang-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+

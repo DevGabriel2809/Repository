@@ -17,7 +17,8 @@
    12. Rodapé
    13. Animações
    14. Scrollbar
-   15. Responsividade
+   15. Alternar idioma
+   16. Responsividade
    ========================================================= */
 
 /* =========================================================
@@ -581,7 +582,37 @@ footer .heart { color: var(--orange); }
 ::-webkit-scrollbar-thumb { background: rgba(0,229,204,0.2); border-radius: 2px; }
 
 /* =========================================================
-   15. RESPONSIVIDADE
+   15. ALTERNAR IDIOMA
+   ========================================================= */
+
+
+.lang-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-family: 'DM Mono', monospace;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+.lang-btn:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+ 
+/* Garante que a nav acomode o botão */
+nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* =========================================================
+   16. RESPONSIVIDADE
    Ajustes para tablets e celulares.
    ========================================================= */
 @media (max-width: 900px) {

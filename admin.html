@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gabriel Andrade · ADMIN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="css/admin.css">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+
+</head>
+<body>
+
+<!-- ── TELA DE LOGIN ── -->
+<div id="login-screen">
+  <h1 id="login-title">&lt;<span>DevGabriel</span> /&gt; Admin</h1>
+  <div class="login-box">
+    <label id="label-senha">SENHA</label>
+    <input type="password" id="senha-input" placeholder="••••••••" autofocus>
+    <button class="btn-entrar" id="btn-entrar" onclick="entrar()">Entrar</button>
+    <div class="login-erro" id="login-erro">Senha incorreta.</div>
+  </div>
+</div>
+
+<!-- ── DASHBOARD ── -->
+<div id="dashboard">
+
+  <header>
+    <div class="logo">&lt;<span>Admin</span> /&gt;</div>
+    <div style="display:flex;gap:12px;align-items:center;">
+      <button class="lang-btn" id="lang-btn-admin" onclick="toggleAdminLang()">🇺🇸 EN</button>
+      <button class="btn-sair" id="btn-sair" onclick="sair()">Sair</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="stats-row" id="stats-row">
+      <div class="stat-card"><div class="s-num" id="total-visitas">—</div><div class="s-label" id="stat-label-acessos">Total de Acessos</div></div>
+      <div class="stat-card"><div class="s-num" id="total-unicos">—</div><div class="s-label" id="stat-label-unicos">IPs Únicos</div></div>
+      <div class="stat-card"><div class="s-num" id="total-paises">—</div><div class="s-label" id="stat-label-paises">Países</div></div>
+      <div class="stat-card"><div class="s-num" id="total-mobile">—</div><div class="s-label" id="stat-label-mobile">Mobile</div></div>
+    </div>
+
+    <div class="section-title" id="sec-paises">Países de acesso</div>
+    <div class="paises-grid" id="paises-grid">
+      <div class="loading"><span>🌍</span>Carregando...</div>
+    </div>
+
+    <div class="section-title" id="sec-historico">Histórico de acessos</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th id="col-data">DATA / HORA</th>
+            <th id="col-pais">PAÍS</th>
+            <th id="col-cidade">CIDADE</th>
+            <th id="col-ip">IP</th>
+            <th id="col-disp">DISPOSITIVO</th>
+            <th id="col-ref">REFERRER</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-body">
+          <tr><td colspan="6" class="loading"><span>⏳</span>Carregando dados...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script>
+
+const SUPABASE_URL = 'https://upzxedxfifhvdhwlphvw.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_2tx3XDBRHeRgp7KVolM2QA_a9JPO3Qw';
+
+const SENHA_HASH = '303ef03c7d48380e69e60df18b0f8e1645416eddec1cc7071d330032ed2562fe';
+
+// ── i18n ADMIN ──
+const adminI18n = {
+  pt: {
+    title: 'Gabriel Andrade · Admin ',
+    loginTitle: '&lt;<span>DevGabriel</span> /&gt; Admin',
+    labelSenha: 'PASSWORD/SENHA',
+    btnEntrar: 'Entrar',
+    erroSenha: 'Senha incorreta.',
+    btnSair: 'Sair',
+    statAcessos: 'Total de Acessos',
+    statUnicos: 'IPs Únicos',
+    statPaises: 'Países',
+    statMobile: 'Mobile',
+    secPaises: 'Países de acesso',
+    secHistorico: 'Histórico de acessos',
+    colData: 'DATA / HORA',
+    colPais: 'PAÍS',
+    colCidade: 'CIDADE',
+    colIp: 'IP',
+    colDisp: 'DISPOSITIVO',
+    colRef: 'REFERRER',
+    loadingPaises: 'Carregando...',
+    loadingTabela: 'Carregando dados...',
+    erroBanco: 'Erro ao carregar. Verifique a URL e Key do Supabase.',
+    semPaises: 'Nenhum acesso ainda.',
+    semAcessos: 'Nenhum acesso registrado ainda.',
+    direto: 'direto',
+    langBtn: '🇺🇸 EN',
+  },
+  en: {
+    title: 'Admin · Gabriel Andrade',
+    loginTitle: '&lt;<span>DevGabriel</span> /&gt; Admin',
+    labelSenha: 'PASSWORD',
+    btnEntrar: 'Sign In',
+    erroSenha: 'Incorrect password.',
+    btnSair: 'Sign Out',
+    statAcessos: 'Total Visits',
+    statUnicos: 'Unique IPs',
+    statPaises: 'Countries',
+    statMobile: 'Mobile',
+    secPaises: 'Access countries',
+    secHistorico: 'Visit history',
+    colData: 'DATE / TIME',
+    colPais: 'COUNTRY',
+    colCidade: 'CITY',
+    colIp: 'IP',
+    colDisp: 'DEVICE',
+    colRef: 'REFERRER',
+    loadingPaises: 'Loading...',
+    loadingTabela: 'Loading data...',
+    erroBanco: 'Failed to load. Check Supabase URL and Key.',
+    semPaises: 'No visits yet.',
+    semAcessos: 'No visits recorded yet.',
+    direto: 'direct',
+    langBtn: '🇧🇷 PT',
+  }
+};
+
+let adminLang = localStorage.getItem('lang') || 'pt';
+
+function applyAdminLang(lang) {
+  adminLang = lang;
+  localStorage.setItem('lang', lang);
+  const t = adminI18n[lang];
+  document.title = t.title;
+  document.getElementById('login-title').innerHTML = t.loginTitle;
+  document.getElementById('label-senha').textContent = t.labelSenha;
+  document.getElementById('btn-entrar').textContent = t.btnEntrar;
+  document.getElementById('login-erro').textContent = t.erroSenha;
+  document.getElementById('btn-sair').textContent = t.btnSair;
+  document.getElementById('stat-label-acessos').textContent = t.statAcessos;
+  document.getElementById('stat-label-unicos').textContent = t.statUnicos;
+  document.getElementById('stat-label-paises').textContent = t.statPaises;
+  document.getElementById('stat-label-mobile').textContent = t.statMobile;
+  document.getElementById('sec-paises').textContent = t.secPaises;
+  document.getElementById('sec-historico').textContent = t.secHistorico;
+  document.getElementById('col-data').textContent = t.colData;
+  document.getElementById('col-pais').textContent = t.colPais;
+  document.getElementById('col-cidade').textContent = t.colCidade;
+  document.getElementById('col-ip').textContent = t.colIp;
+  document.getElementById('col-disp').textContent = t.colDisp;
+  document.getElementById('col-ref').textContent = t.colRef;
+  document.getElementById('lang-btn-admin').innerHTML = t.langBtn;
+}
+
+function toggleAdminLang() {
+  applyAdminLang(adminLang === 'pt' ? 'en' : 'pt');
+}
+
+// ── HASH SHA-256 ──
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2,'0')).join('');
+}
+
+const BANDEIRAS = {
+  BR:'🇧🇷', US:'🇺🇸', PT:'🇵🇹', AR:'🇦🇷', FR:'🇫🇷', DE:'🇩🇪',
+  IT:'🇮🇹', ES:'🇪🇸', GB:'🇬🇧', JP:'🇯🇵', CN:'🇨🇳', MX:'🇲🇽',
+  CA:'🇨🇦', AU:'🇦🇺', CL:'🇨🇱', CO:'🇨🇴', UY:'🇺🇾', PE:'🇵🇪',
+};
+function bandeira(code) { return BANDEIRAS[code] || '🏳️'; }
+
+async function entrar() {
+  const v = document.getElementById('senha-input').value;
+  const erro = document.getElementById('login-erro');
+  const hash = await sha256(v);
+  if (hash === SENHA_HASH) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    carregarDados();
+  } else {
+    erro.style.display = 'block';
+    document.getElementById('senha-input').value = '';
+  }
+}
+document.getElementById('senha-input').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
+
+function sair() {
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('senha-input').value = '';
+}
+
+async function carregarDados() {
+  const t = adminI18n[adminLang];
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/visitas?select=*&order=visitado_em.desc&limit=500`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+    );
+    const visitas = await res.json();
+    renderizarDados(visitas);
+  } catch(e) {
+    document.getElementById('tabela-body').innerHTML =
+      `<tr><td colspan="6" class="loading"><span>❌</span>${t.erroBanco}</td></tr>`;
+  }
+}
+
+function renderizarDados(visitas) {
+  const t = adminI18n[adminLang];
+  const ipsUnicos = new Set(visitas.map(v => v.ip)).size;
+  const paisesUnicos = new Set(visitas.map(v => v.pais_codigo)).size;
+  const mobile = visitas.filter(v => v.dispositivo === 'mobile').length;
+
+  document.getElementById('total-visitas').textContent = visitas.length;
+  document.getElementById('total-unicos').textContent = ipsUnicos;
+  document.getElementById('total-paises').textContent = paisesUnicos;
+  document.getElementById('total-mobile').textContent = mobile;
+
+  const contPaises = {};
+  visitas.forEach(v => {
+    const k = v.pais_codigo;
+    if (!contPaises[k]) contPaises[k] = { nome: v.pais, codigo: k, count: 0 };
+    contPaises[k].count++;
+  });
+  const paisesOrdenados = Object.values(contPaises).sort((a, b) => b.count - a.count);
+  document.getElementById('paises-grid').innerHTML = paisesOrdenados.length
+    ? paisesOrdenados.map(p =>
+        `<div class="pais-chip">${bandeira(p.codigo)} ${p.nome} <span class="count">${p.count}</span></div>`
+      ).join('')
+    : `<div class="loading"><span>🌍</span>${t.semPaises}</div>`;
+
+  if (!visitas.length) {
+    document.getElementById('tabela-body').innerHTML =
+      `<tr><td colspan="6" class="loading"><span>📭</span>${t.semAcessos}</td></tr>`;
+    return;
+  }
+
+  document.getElementById('tabela-body').innerHTML = visitas.map(v => {
+    const data = new Date(v.visitado_em);
+    const dataStr = data.toLocaleDateString(adminLang === 'pt' ? 'pt-BR' : 'en-US') + ' ' +
+      data.toLocaleTimeString(adminLang === 'pt' ? 'pt-BR' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+    const badge = v.dispositivo === 'mobile'
+      ? '<span class="badge badge-mobile">📱 mobile</span>'
+      : '<span class="badge badge-desktop">💻 desktop</span>';
+    const ref = v.referrer === 'direto' ? `<span style="color:var(--muted)">${t.direto}</span>`
+      : `<span class="mono" title="${v.referrer}">${v.referrer.replace(/https?:\/\//, '').slice(0,30)}</span>`;
+    return `
+      <tr>
+        <td class="mono">${dataStr}</td>
+        <td>${bandeira(v.pais_codigo)} ${v.pais}</td>
+        <td>${v.cidade}${v.regiao && v.regiao !== v.cidade ? ` <span class="mono">/ ${v.regiao}</span>` : ''}</td>
+        <td class="mono">${v.ip}</td>
+        <td>${badge}</td>
+        <td>${ref}</td>
+      </tr>`;
+  }).join('');
+}
+
+// Aplica idioma na carga
+applyAdminLang(adminLang);
+</script>
+</body>
+</html><!-- lang-btn CSS já está no admin.css, mas precisamos garantir que está lá -->
