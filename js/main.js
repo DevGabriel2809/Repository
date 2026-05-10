@@ -1,15 +1,10 @@
-// =========================================================
-// PORTFÓLIO — GABRIEL ANDRADE
-// Arquivo: js/main.js
-// Versão corrigida: evita conflito com scripts inline e expõe toggleLang no window.
-// =========================================================
+
 
 (() => {
 'use strict';
 
 // =========================================================
 // PORTFÓLIO — GABRIEL ANDRADE
-// Arquivo: js/main.js
 //
 // SUMÁRIO
 // 01. Cursor personalizado
@@ -280,8 +275,7 @@ const i18n = {
     'contact.title': 'Vamos<br>conversar.',
     'contact.sub': 'Aberto a contratação, projetos freelance e colaborações. Me manda uma mensagem!',
 
-    'footer.copy': '© 2026 Gabriel Andrade',
-    'footer.built': 'Construído com <span class="heart">♥</span> em HTML · CSS · JS',
+    
   },
 
   en: {
@@ -371,8 +365,7 @@ const i18n = {
     'contact.title': 'Let\'s<br>talk.',
     'contact.sub': 'Open to job offers, freelance projects and collaborations. Send me a message!',
 
-    'footer.copy': '© 2026 Gabriel Andrade',
-    'footer.built': 'Built with <span class="heart">♥</span> in HTML · CSS · JS',
+    
   }
 };
 
