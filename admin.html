@@ -67,14 +67,44 @@
             <th id="col-ip">IP</th>
             <th id="col-disp">DISPOSITIVO</th>
             <th id="col-ref">REFERRER</th>
+            <th id="col-acoes">AÇÕES</th>
           </tr>
         </thead>
         <tbody id="tabela-body">
-          <tr><td colspan="6" class="loading"><span>⏳</span>Carregando dados...</td></tr>
+          <tr><td colspan="7" class="loading"><span>⏳</span>Carregando dados...</td></tr>
         </tbody>
       </table>
     </div>
   </main>
+</div>
+
+
+<!-- ── MODAL DE DETALHES DO ACESSO ── -->
+<div class="access-modal" id="access-modal" aria-hidden="true">
+  <div class="access-modal-backdrop" onclick="fecharModalAcesso()"></div>
+  <div class="access-modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-access-title">
+    <div class="access-modal-header">
+      <div>
+        <span class="modal-kicker" id="modal-access-kicker">Detalhes do acesso</span>
+        <h2 id="modal-access-title">Acesso</h2>
+      </div>
+      <button class="modal-close-btn" type="button" onclick="fecharModalAcesso()" aria-label="Fechar">×</button>
+    </div>
+
+    <div class="modal-summary" id="modal-summary"></div>
+
+    <div class="modal-actions">
+      <a class="map-btn" id="modal-map-link" href="#" target="_blank" rel="noopener">Abrir no Google Maps</a>
+      <button class="delete-single-btn" id="modal-delete-btn" type="button" onclick="excluirAcessoSelecionado()">Excluir este acesso</button>
+    </div>
+
+    <div class="modal-details-grid" id="modal-details-grid"></div>
+
+    <details class="raw-details" id="raw-details">
+      <summary>Dados brutos da API</summary>
+      <pre id="modal-raw-json">{}</pre>
+    </details>
+  </div>
 </div>
 
 <script>
@@ -95,6 +125,19 @@ const adminI18n = {
     btnSair: 'Sair',
     btnAtualizar: 'Atualizar dados',
     btnLimpar: 'Limpar lista',
+    btnDetalhes: 'Detalhes',
+    btnExcluir: 'Excluir',
+    colAcoes: 'AÇÕES',
+    modalTitulo: 'Detalhes do acesso',
+    modalKicker: 'Acesso selecionado',
+    modalMapa: 'Abrir no Google Maps',
+    modalSemMapa: 'Coordenadas indisponíveis',
+    modalExcluir: 'Excluir este acesso',
+    confirmExcluirUm: 'Tem certeza que deseja apagar este acesso?',
+    excluindoUm: 'Excluindo acesso...',
+    acessoExcluido: 'Acesso excluído às',
+    erroExcluirUm: 'Erro ao excluir acesso.',
+    rawResumo: 'Dados brutos da API',
     confirmLimpar: 'Tem certeza que deseja apagar todos os acessos registrados?',
     limpando: 'Limpando lista...',
     listaLimpa: 'Lista limpa às',
@@ -131,6 +174,19 @@ const adminI18n = {
     btnSair: 'Sign Out',
     btnAtualizar: 'Refresh data',
     btnLimpar: 'Clear list',
+    btnDetalhes: 'Details',
+    btnExcluir: 'Delete',
+    colAcoes: 'ACTIONS',
+    modalTitulo: 'Visit details',
+    modalKicker: 'Selected access',
+    modalMapa: 'Open in Google Maps',
+    modalSemMapa: 'Coordinates unavailable',
+    modalExcluir: 'Delete this access',
+    confirmExcluirUm: 'Are you sure you want to delete this visit?',
+    excluindoUm: 'Deleting visit...',
+    acessoExcluido: 'Visit deleted at',
+    erroExcluirUm: 'Failed to delete visit.',
+    rawResumo: 'Raw API data',
     confirmLimpar: 'Are you sure you want to delete all recorded visits?',
     limpando: 'Clearing list...',
     listaLimpa: 'List cleared at',
@@ -161,6 +217,8 @@ const adminI18n = {
 };
 
 let adminLang = localStorage.getItem('lang') || 'pt';
+let visitasCache = [];
+let acessoSelecionadoId = null;
 
 function applyAdminLang(lang) {
   adminLang = lang;
@@ -191,6 +249,16 @@ function applyAdminLang(lang) {
   document.getElementById('col-ip').textContent = t.colIp;
   document.getElementById('col-disp').textContent = t.colDisp;
   document.getElementById('col-ref').textContent = t.colRef;
+  const colAcoes = document.getElementById('col-acoes');
+  if (colAcoes) colAcoes.textContent = t.colAcoes;
+  const modalKicker = document.getElementById('modal-access-kicker');
+  if (modalKicker) modalKicker.textContent = t.modalKicker;
+  const modalMapLink = document.getElementById('modal-map-link');
+  if (modalMapLink && !modalMapLink.dataset.disabled) modalMapLink.textContent = t.modalMapa;
+  const modalDeleteBtn = document.getElementById('modal-delete-btn');
+  if (modalDeleteBtn) modalDeleteBtn.textContent = t.modalExcluir;
+  const rawSummary = document.querySelector('#raw-details summary');
+  if (rawSummary) rawSummary.textContent = t.rawResumo;
   document.getElementById('lang-btn-admin').innerHTML = t.langBtn;
 }
 
@@ -312,14 +380,84 @@ function atualizarDados() {
   carregarDados();
 }
 
+function escaparHTML(valor) {
+  return String(valor ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function valorOuTraco(valor) {
+  if (valor === null || valor === undefined || valor === '') return '—';
+  return String(valor);
+}
+
+function localeAtual() {
+  return adminLang === 'pt' ? 'pt-BR' : 'en-US';
+}
+
+function formatarData(valor, completa = false) {
+  if (!valor) return '—';
+  const data = new Date(valor);
+  if (Number.isNaN(data.getTime())) return '—';
+
+  if (completa) {
+    return data.toLocaleString(localeAtual(), {
+      dateStyle: 'full',
+      timeStyle: 'medium'
+    });
+  }
+
+  return data.toLocaleDateString(localeAtual()) + ' ' +
+    data.toLocaleTimeString(localeAtual(), { hour: '2-digit', minute: '2-digit' });
+}
+
+function coordenadasValidas(v) {
+  const lat = Number(v?.latitude);
+  const lng = Number(v?.longitude);
+  return Number.isFinite(lat) && Number.isFinite(lng);
+}
+
+function urlGoogleMaps(v) {
+  if (!coordenadasValidas(v)) return null;
+  return `https://www.google.com/maps?q=${encodeURIComponent(v.latitude + ',' + v.longitude)}`;
+}
+
+function textoCoordenadas(v) {
+  if (!coordenadasValidas(v)) return '—';
+  return `${Number(v.latitude).toFixed(6)}, ${Number(v.longitude).toFixed(6)}`;
+}
+
+function resumirNavegador(userAgent) {
+  const ua = String(userAgent || '');
+  if (!ua) return '—';
+  if (/Edg\//i.test(ua)) return 'Microsoft Edge';
+  if (/Chrome\//i.test(ua) && !/Chromium|Edg\//i.test(ua)) return 'Google Chrome';
+  if (/Firefox\//i.test(ua)) return 'Mozilla Firefox';
+  if (/Safari\//i.test(ua) && !/Chrome\//i.test(ua)) return 'Safari';
+  if (/OPR\//i.test(ua) || /Opera/i.test(ua)) return 'Opera';
+  return 'Navegador não identificado';
+}
+
+function criarItemDetalhe(rotulo, valor, extra = '') {
+  return `
+    <div class="detail-item ${extra}">
+      <span>${escaparHTML(rotulo)}</span>
+      <strong>${valor}</strong>
+    </div>`;
+}
+
 function renderizarVazio() {
   const t = adminI18n[adminLang];
+  visitasCache = [];
   document.getElementById('total-visitas').textContent = '0';
   document.getElementById('total-unicos').textContent = '0';
   document.getElementById('total-paises').textContent = '0';
   document.getElementById('total-mobile').textContent = '0';
   document.getElementById('paises-grid').innerHTML = `<div class="loading"><span>🌍</span>${t.semPaises}</div>`;
-  document.getElementById('tabela-body').innerHTML = `<tr><td colspan="6" class="loading"><span>📭</span>${t.semAcessos}</td></tr>`;
+  document.getElementById('tabela-body').innerHTML = `<tr><td colspan="7" class="loading"><span>📭</span>${t.semAcessos}</td></tr>`;
 }
 
 async function limparAcessos() {
@@ -343,8 +481,9 @@ async function limparAcessos() {
     }
 
     renderizarVazio();
+    fecharModalAcesso();
     const status = document.getElementById('refresh-status');
-    const hora = new Date().toLocaleTimeString(adminLang === 'pt' ? 'pt-BR' : 'en-US', {
+    const hora = new Date().toLocaleTimeString(localeAtual(), {
       hour: '2-digit', minute: '2-digit', second: '2-digit'
     });
     if (status) {
@@ -355,11 +494,58 @@ async function limparAcessos() {
     console.error('[admin] erro ao limpar acessos:', e);
     const status = document.getElementById('refresh-status');
     if (status) status.textContent = `${t.erroLimpar} ${e.message}`;
-    alert(`${t.erroLimpar}
-${e.message}`);
+    alert(`${t.erroLimpar}\n${e.message}`);
   } finally {
     setClearState(false);
   }
+}
+
+async function excluirAcesso(id, options = {}) {
+  const t = adminI18n[adminLang];
+  const acessoId = Number(id);
+  if (!Number.isFinite(acessoId)) return;
+
+  if (!options.skipConfirm && !confirm(t.confirmExcluirUm)) return;
+
+  const status = document.getElementById('refresh-status');
+  try {
+    if (status) status.textContent = t.excluindoUm;
+
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/visitas?id=eq.${encodeURIComponent(acessoId)}`, {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Prefer': 'return=minimal',
+      }
+    });
+
+    if (!res.ok) {
+      const erroTexto = await res.text();
+      throw new Error(`Supabase retornou ${res.status}: ${erroTexto}`);
+    }
+
+    visitasCache = visitasCache.filter(v => Number(v.id) !== acessoId);
+    renderizarDados(visitasCache);
+
+    if (acessoSelecionadoId === acessoId) fecharModalAcesso();
+
+    const hora = new Date().toLocaleTimeString(localeAtual(), {
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+    if (status) {
+      status.dataset.lastUpdate = hora;
+      status.textContent = `${t.acessoExcluido} ${hora}`;
+    }
+  } catch (e) {
+    console.error('[admin] erro ao excluir acesso:', e);
+    if (status) status.textContent = `${t.erroExcluirUm} ${e.message}`;
+    alert(`${t.erroExcluirUm}\n${e.message}`);
+  }
+}
+
+function excluirAcessoSelecionado() {
+  if (acessoSelecionadoId !== null) excluirAcesso(acessoSelecionadoId);
 }
 
 async function carregarDados() {
@@ -388,7 +574,7 @@ async function carregarDados() {
   } catch(e) {
     console.error('[admin] erro ao carregar dados:', e);
     document.getElementById('tabela-body').innerHTML =
-      `<tr><td colspan="6" class="loading"><span>❌</span>${t.erroBanco}<br><small>${e.message}</small></td></tr>`;
+      `<tr><td colspan="7" class="loading"><span>❌</span>${t.erroBanco}<br><small>${escaparHTML(e.message)}</small></td></tr>`;
   } finally {
     setRefreshState(false);
   }
@@ -396,55 +582,150 @@ async function carregarDados() {
 
 function renderizarDados(visitas) {
   const t = adminI18n[adminLang];
-  const ipsUnicos = new Set(visitas.map(v => v.ip)).size;
-  const paisesUnicos = new Set(visitas.map(v => v.pais_codigo)).size;
-  const mobile = visitas.filter(v => v.dispositivo === 'mobile').length;
+  visitasCache = Array.isArray(visitas) ? visitas : [];
 
-  document.getElementById('total-visitas').textContent = visitas.length;
+  const ipsUnicos = new Set(visitasCache.map(v => v.ip).filter(Boolean)).size;
+  const paisesUnicos = new Set(visitasCache.map(v => v.pais_codigo).filter(Boolean)).size;
+  const mobile = visitasCache.filter(v => v.dispositivo === 'mobile').length;
+
+  document.getElementById('total-visitas').textContent = visitasCache.length;
   document.getElementById('total-unicos').textContent = ipsUnicos;
   document.getElementById('total-paises').textContent = paisesUnicos;
   document.getElementById('total-mobile').textContent = mobile;
 
   const contPaises = {};
-  visitas.forEach(v => {
-    const k = v.pais_codigo;
-    if (!contPaises[k]) contPaises[k] = { nome: v.pais, codigo: k, count: 0 };
+  visitasCache.forEach(v => {
+    const k = v.pais_codigo || '--';
+    if (!contPaises[k]) contPaises[k] = { nome: v.pais || 'Não identificado', codigo: k, count: 0 };
     contPaises[k].count++;
   });
+
   const paisesOrdenados = Object.values(contPaises).sort((a, b) => b.count - a.count);
   document.getElementById('paises-grid').innerHTML = paisesOrdenados.length
     ? paisesOrdenados.map(p =>
-        `<div class="pais-chip">${bandeira(p.codigo)} ${p.nome} <span class="count">${p.count}</span></div>`
+        `<button type="button" class="pais-chip" title="${escaparHTML(p.nome)}">${bandeira(p.codigo)} ${escaparHTML(p.nome)} <span class="count">${p.count}</span></button>`
       ).join('')
     : `<div class="loading"><span>🌍</span>${t.semPaises}</div>`;
 
-  if (!visitas.length) {
+  if (!visitasCache.length) {
     document.getElementById('tabela-body').innerHTML =
-      `<tr><td colspan="6" class="loading"><span>📭</span>${t.semAcessos}</td></tr>`;
+      `<tr><td colspan="7" class="loading"><span>📭</span>${t.semAcessos}</td></tr>`;
     return;
   }
 
-  document.getElementById('tabela-body').innerHTML = visitas.map(v => {
-    const data = new Date(v.visitado_em);
-    const dataStr = data.toLocaleDateString(adminLang === 'pt' ? 'pt-BR' : 'en-US') + ' ' +
-      data.toLocaleTimeString(adminLang === 'pt' ? 'pt-BR' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+  document.getElementById('tabela-body').innerHTML = visitasCache.map(v => {
+    const dataStr = formatarData(v.visitado_em);
     const badge = v.dispositivo === 'mobile'
       ? '<span class="badge badge-mobile">📱 mobile</span>'
       : '<span class="badge badge-desktop">💻 desktop</span>';
-    const ref = v.referrer === 'direto' ? `<span style="color:var(--muted)">${t.direto}</span>`
-      : `<span class="mono" title="${v.referrer}">${v.referrer.replace(/https?:\/\//, '').slice(0,30)}</span>`;
+    const refTexto = v.referrer === 'direto' ? t.direto : String(v.referrer || '—').replace(/https?:\/\//, '').slice(0,30);
+    const ref = v.referrer === 'direto'
+      ? `<span style="color:var(--muted)">${t.direto}</span>`
+      : `<span class="mono" title="${escaparHTML(v.referrer)}">${escaparHTML(refTexto)}</span>`;
+
     return `
-      <tr>
-        <td class="mono">${dataStr}</td>
-        <td>${bandeira(v.pais_codigo)} ${v.pais}</td>
-        <td>${v.cidade}${v.regiao && v.regiao !== v.cidade ? ` <span class="mono">/ ${v.regiao}</span>` : ''}</td>
-        <td class="mono">${v.ip}</td>
-        <td>${badge}</td>
-        <td>${ref}</td>
+      <tr class="access-row" onclick="abrirDetalhesAcesso(${Number(v.id)})" tabindex="0" onkeydown="if(event.key==='Enter'){abrirDetalhesAcesso(${Number(v.id)})}">
+        <td class="mono" data-label="${t.colData}">${escaparHTML(dataStr)}</td>
+        <td data-label="${t.colPais}">${bandeira(v.pais_codigo)} ${escaparHTML(v.pais || '—')}</td>
+        <td data-label="${t.colCidade}">${escaparHTML(v.cidade || '—')}${v.regiao && v.regiao !== v.cidade ? ` <span class="mono">/ ${escaparHTML(v.regiao)}</span>` : ''}</td>
+        <td class="mono" data-label="${t.colIp}">${escaparHTML(v.ip || '—')}</td>
+        <td data-label="${t.colDisp}">${badge}</td>
+        <td data-label="${t.colRef}">${ref}</td>
+        <td class="actions-cell" data-label="${t.colAcoes}">
+          <button type="button" class="row-details-btn" onclick="event.stopPropagation(); abrirDetalhesAcesso(${Number(v.id)})">${escaparHTML(t.btnDetalhes)}</button>
+          <button type="button" class="row-delete-btn" onclick="event.stopPropagation(); excluirAcesso(${Number(v.id)})">${escaparHTML(t.btnExcluir)}</button>
+        </td>
       </tr>`;
   }).join('');
 }
 
+function abrirDetalhesAcesso(id) {
+  const t = adminI18n[adminLang];
+  const acesso = visitasCache.find(v => Number(v.id) === Number(id));
+  if (!acesso) return;
+
+  acessoSelecionadoId = Number(acesso.id);
+
+  const modal = document.getElementById('access-modal');
+  const title = document.getElementById('modal-access-title');
+  const summary = document.getElementById('modal-summary');
+  const grid = document.getElementById('modal-details-grid');
+  const mapLink = document.getElementById('modal-map-link');
+  const raw = document.getElementById('modal-raw-json');
+
+  title.textContent = `${acesso.cidade || 'Acesso'} · ${acesso.pais || acesso.ip || ''}`;
+
+  summary.innerHTML = `
+    <div class="summary-chip"><span>IP</span><strong>${escaparHTML(acesso.ip || '—')}</strong></div>
+    <div class="summary-chip"><span>Local</span><strong>${bandeira(acesso.pais_codigo)} ${escaparHTML(acesso.cidade || '—')} / ${escaparHTML(acesso.pais || '—')}</strong></div>
+    <div class="summary-chip"><span>Dispositivo</span><strong>${escaparHTML(acesso.dispositivo || '—')}</strong></div>
+    <div class="summary-chip"><span>Data</span><strong>${escaparHTML(formatarData(acesso.visitado_em))}</strong></div>
+  `;
+
+  const mapsUrl = urlGoogleMaps(acesso);
+  if (mapsUrl) {
+    mapLink.href = mapsUrl;
+    mapLink.textContent = t.modalMapa;
+    mapLink.classList.remove('disabled');
+    mapLink.dataset.disabled = '';
+  } else {
+    mapLink.href = '#';
+    mapLink.textContent = t.modalSemMapa;
+    mapLink.classList.add('disabled');
+    mapLink.dataset.disabled = 'true';
+  }
+
+  const navegadorResumo = resumirNavegador(acesso.navegador);
+  const detalhes = [
+    ['ID', acesso.id],
+    ['Data completa', formatarData(acesso.visitado_em, true)],
+    ['IP', acesso.ip],
+    ['Cidade', acesso.cidade],
+    ['Região/Estado', acesso.regiao],
+    ['País', `${bandeira(acesso.pais_codigo)} ${acesso.pais || '—'} (${acesso.pais_codigo || '—'})`],
+    ['Latitude/Longitude', textoCoordenadas(acesso)],
+    ['Fuso horário do visitante', acesso.fuso_horario],
+    ['Timezone da geolocalização', acesso.timezone_geo],
+    ['CEP/Postal', acesso.postal],
+    ['Moeda', acesso.currency],
+    ['Organização/ISP', acesso.org],
+    ['ASN', acesso.asn],
+    ['Dispositivo', acesso.dispositivo],
+    ['Navegador detectado', navegadorResumo],
+    ['User-Agent completo', acesso.navegador],
+    ['Idioma do navegador', acesso.idioma],
+    ['Plataforma/Sistema', acesso.plataforma],
+    ['Tela', acesso.tela],
+    ['Página acessada', acesso.pagina],
+    ['Origem/Referrer', acesso.referrer || t.direto],
+  ];
+
+  grid.innerHTML = detalhes.map(([rotulo, valor]) => {
+    const texto = escaparHTML(valorOuTraco(valor));
+    const classe = String(rotulo).includes('User-Agent') || String(rotulo).includes('Origem') ? 'wide' : '';
+    return criarItemDetalhe(rotulo, texto, classe);
+  }).join('');
+
+  const rawGeo = acesso.raw_geo || {};
+  raw.textContent = JSON.stringify(rawGeo, null, 2);
+
+  modal.classList.add('is-open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('modal-open');
+}
+
+function fecharModalAcesso() {
+  const modal = document.getElementById('access-modal');
+  if (!modal) return;
+  modal.classList.remove('is-open');
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('modal-open');
+  acessoSelecionadoId = null;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') fecharModalAcesso();
+});
 
 // ── CURSOR PERSONALIZADO ──
 const cursor = document.getElementById('cursor');
@@ -476,6 +757,10 @@ window.entrar = entrar;
 window.sair = sair;
 window.atualizarDados = atualizarDados;
 window.limparAcessos = limparAcessos;
+window.abrirDetalhesAcesso = abrirDetalhesAcesso;
+window.fecharModalAcesso = fecharModalAcesso;
+window.excluirAcesso = excluirAcesso;
+window.excluirAcessoSelecionado = excluirAcessoSelecionado;
 window.toggleAdminLang = toggleAdminLang;
 
 // Aplica idioma e restaura sessão na carga

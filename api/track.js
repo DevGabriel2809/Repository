@@ -52,6 +52,19 @@ function geoPelosHeadersDaVercel(req, ip) {
     pais_codigo: codigo || '--',
     latitude: latitude ? Number(latitude) : null,
     longitude: longitude ? Number(longitude) : null,
+    timezone: null,
+    org: null,
+    asn: null,
+    postal: null,
+    currency: null,
+    raw_geo: {
+      source: 'vercel-headers',
+      country: codigo || null,
+      city: cidade || null,
+      region: regiao || null,
+      latitude: latitude || null,
+      longitude: longitude || null,
+    },
   };
 }
 
@@ -73,6 +86,12 @@ async function geoPorIpApi(ip) {
     pais_codigo: data.country_code || '--',
     latitude: data.latitude || null,
     longitude: data.longitude || null,
+    timezone: data.timezone || null,
+    org: data.org || data.org_name || null,
+    asn: data.asn || null,
+    postal: data.postal || null,
+    currency: data.currency || null,
+    raw_geo: data,
   };
 }
 
@@ -94,6 +113,12 @@ async function geoPorIpWhoIs(ip) {
     pais_codigo: data.country_code || '--',
     latitude: data.latitude || null,
     longitude: data.longitude || null,
+    timezone: data.timezone?.id || null,
+    org: data.connection?.org || data.connection?.isp || null,
+    asn: data.connection?.asn ? String(data.connection.asn) : null,
+    postal: data.postal || null,
+    currency: data.currency?.code || null,
+    raw_geo: data,
   };
 }
 
@@ -116,6 +141,12 @@ async function geoPorCountryIs(ip) {
     pais_codigo: codigo,
     latitude: null,
     longitude: null,
+    timezone: null,
+    org: null,
+    asn: null,
+    postal: null,
+    currency: null,
+    raw_geo: data,
   };
 }
 
@@ -172,9 +203,19 @@ export default async function handler(req, res) {
       latitude: geo.latitude,
       longitude: geo.longitude,
       dispositivo: body.dispositivo || 'desktop',
-      navegador: String(body.navegador || 'Não informado').slice(0, 120),
+      navegador: String(body.navegador || 'Não informado').slice(0, 255),
       pagina: body.pagina || '/',
       referrer: body.referrer || 'direto',
+      idioma: body.idioma || 'Não informado',
+      plataforma: body.plataforma || 'Não informado',
+      tela: body.tela || 'Não informado',
+      fuso_horario: body.fuso_horario || geo.timezone || 'Não informado',
+      timezone_geo: geo.timezone || null,
+      org: geo.org || null,
+      asn: geo.asn || null,
+      postal: geo.postal || null,
+      currency: geo.currency || null,
+      raw_geo: geo.raw_geo || null,
     };
 
     const resposta = await fetch(`${SUPABASE_URL}/rest/v1/visitas`, {

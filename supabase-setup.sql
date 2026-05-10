@@ -16,8 +16,31 @@ create table if not exists public.visitas (
   navegador text,
   pagina text,
   referrer text,
+  idioma text,
+  plataforma text,
+  tela text,
+  fuso_horario text,
+  timezone_geo text,
+  org text,
+  asn text,
+  postal text,
+  currency text,
+  raw_geo jsonb,
   visitado_em timestamptz not null default now()
 );
+
+
+-- Garante novas colunas em projetos que já tinham a tabela criada.
+alter table public.visitas add column if not exists idioma text;
+alter table public.visitas add column if not exists plataforma text;
+alter table public.visitas add column if not exists tela text;
+alter table public.visitas add column if not exists fuso_horario text;
+alter table public.visitas add column if not exists timezone_geo text;
+alter table public.visitas add column if not exists org text;
+alter table public.visitas add column if not exists asn text;
+alter table public.visitas add column if not exists postal text;
+alter table public.visitas add column if not exists currency text;
+alter table public.visitas add column if not exists raw_geo jsonb;
 
 alter table public.visitas enable row level security;
 

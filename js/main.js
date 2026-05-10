@@ -134,11 +134,16 @@ function detectarDispositivo() {
 }
 
 function montarDadosBasicosDaVisita() {
+  const tela = `${window.screen?.width || 0}x${window.screen?.height || 0}`;
   return {
     dispositivo: detectarDispositivo(),
-    navegador: navigator.userAgent.slice(0, 120),
+    navegador: navigator.userAgent.slice(0, 255),
     pagina: window.location.pathname || '/',
-    referrer: document.referrer || 'direto'
+    referrer: document.referrer || 'direto',
+    idioma: navigator.language || 'Não informado',
+    plataforma: navigator.platform || 'Não informado',
+    tela,
+    fuso_horario: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Não informado'
   };
 }
 
